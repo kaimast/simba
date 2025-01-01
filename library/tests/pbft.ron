@@ -1,0 +1,18 @@
+(
+    protocol: "pbft",
+    network: "a2a_small",
+    timeout: Seconds(
+        warmup: 300,
+        runtime: 1800,
+    ),
+    asserts: [
+        Assert(
+            metric: Chain(Throughput),
+            constraint: GreaterThan(0),
+        ),
+        Assert(
+            metric: Chain(Latency),
+            constraint: GreaterThan(0),
+        )
+    ]
+)

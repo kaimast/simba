@@ -1,0 +1,24 @@
+[package]
+name = "simba-native-gui"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Simulating Byzantine Fault-Tolerant Applications"
+
+[[bin]]
+name = "simba-visualizer"
+path = "src/main.rs"
+
+[dependencies]
+log = "0.4"
+env_logger = "0.11"
+num_cpus = "1"
+clap = { version="4", default-features=false, features=["std", "suggestions", "help", "color", "cargo", "std", "derive"] }
+tokio = { version="1", features=["rt-multi-thread", "tracing"] }
+simba-visualizer = { path="../visualizer"} #features=["smaa"] }
+simba = { path="../simba" }
+ron = "0.8"
+winit = { workspace=true }
+anyhow = "1"
+console-subscriber = { workspace=true }
+iced_winit = { workspace=true }

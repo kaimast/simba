@@ -1,0 +1,10 @@
+target
+wasm-target
+/build
+/pkg
+/out
+simba-trace.folded
+*.csv
+*.eps
+*.pdf
+plot.svg

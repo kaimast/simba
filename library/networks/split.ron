@@ -1,0 +1,51 @@
+PreDefined(
+    nodes: [
+        (
+            location: (longitude: 0, latitude: 0),
+            bandwidth: 50,
+            is_mining: true
+        ),
+        (
+            location: (longitude: 10, latitude: 10),
+            bandwidth: 5,
+            is_mining: true
+        ),
+        (
+            location: (longitude: 10, latitude: 0),
+            bandwidth: 5,
+            is_mining: true
+        ),
+        (
+            location: (longitude: 20, latitude: 0),
+            bandwidth: 50,
+            is_mining: true
+        ),
+    ],
+    links: [
+        (
+            node1: 0,
+            node2: 1,
+            bandwidth: None,
+            latency: 0,
+        ),
+        (
+            node1: 0,
+            node2: 2,
+            bandwidth: None,
+            latency: 0,
+        ),
+        (
+            node1: 1,
+            node2: 3,
+            bandwidth: None,
+            latency: 0,
+        ),
+        (
+            node1: 2,
+            node2: 3,
+            bandwidth: None,
+            latency: 0,
+        ),
+    ],
+    clients: [],
+)

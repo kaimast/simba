@@ -1,0 +1,25 @@
+[package]
+name = "simba-web-gui"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Simulating Byzantine Fault-Tolerant Applications"
+#forced-target = "wasm32-unknown-unknown"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+tokio = { version="1", default-features=false, features=["rt", "sync", "rt-multi-thread"] }
+simba-visualizer = { path="../visualizer", features=["wasm"] }
+simba = { path="../simba", features=["wasm"] }
+getrandom = { version="0.2", features=["js"] }
+wgpu = { workspace=true, features=["spirv", "webgl"] }
+winit = { workspace=true }
+iced_winit = "0.12"
+anyhow = "1"
+web-sys = { version="0.3", features=["HtmlCanvasElement", "HtmlBodyElement", "Element", "Document", "Window"] }
+wasm-bindgen = "0.2"
+instant = "0.1"
+log = "0.4"
+console_log = { version="1", features=["color"] }

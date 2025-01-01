@@ -1,0 +1,10 @@
+NakamotoConsensus(
+    block_generation: ProofOfWork(
+        initial_difficulty: 4_000,
+        difficulty_adjustment: Incremental(EthereumHomestead),
+        target_block_interval: 14,
+    ),
+    use_ghost: true,
+    max_block_size: 1_000_000,
+    commit_delay: 64,
+)

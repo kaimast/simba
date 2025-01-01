@@ -1,0 +1,13 @@
+Random(
+    num_mining_nodes: 50,
+    num_non_mining_nodes: 25,
+    link_latency: 50,
+    link_bandwidth: None,
+    node_bandwidth: 50,
+    connectivity: Sparse( min_conns_per_node: 5 ),
+    workload: (
+        num_clients: 5_000,
+        client_startup_interval: 1_000,
+        transaction_interval: 0,
+    )
+)

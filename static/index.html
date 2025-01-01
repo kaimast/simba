@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <script type="module">
+        import init, { run_simulation } from './pkg/simba_web_gui.js';
+
+        console.log("Loading WASM module");
+        await init();
+        run_simulation();
+    </script>
+
+    <canvas id="render_canvas" width="60em" height="40em" />
+  </body>
+</html>

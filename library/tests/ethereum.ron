@@ -1,0 +1,25 @@
+(
+    protocol: "ethereum",
+    network: "p2p_medium",
+    // Warm up for 5 hours to adjust difficulty
+    timeout: Seconds(
+        warmup: 18000,
+        runtime: 36000,
+    ),
+    asserts: [
+        Assert(
+            metric: Chain(BlockInterval),
+            // This will not be perfectly be 14 for a small network size
+            constraint: InRange( min: 10.0, max: 20.0 ),
+        ),
+        Assert(
+            metric: Chain(Throughput),
+            constraint: GreaterThan(0),
+        ),
+        Assert(
+            metric: Chain(Latency),
+            // Latency is 64 blocks, each block should take at least 10 seconds
+            constraint: GreaterThan(640000),
+        ),
+    ]
+)

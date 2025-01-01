@@ -1,0 +1,14 @@
+(
+    protocol: "ouroboros",
+    network: "p2p_medium_lowlatency",
+    timeout: Seconds (
+        warmup: 0,
+        runtime: 3600,
+    ),
+    asserts: [
+        Assert(
+            metric: Chain(BlockInterval),
+            constraint: InRange( min: 0.75, max: 1.25 ),
+        )
+    ]
+)

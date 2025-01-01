@@ -1,0 +1,15 @@
+(
+    protocol: "bitcoin",
+    network: "p2p_medium",
+    // Warm up for 10 hours to adjust difficulty
+    timeout: Seconds(
+        warmup: 36000,
+        runtime: 36000,
+    ),
+    asserts: [
+        Assert(
+            metric: Chain(BlockInterval),
+            constraint: InRange( min: 500.0, max: 700.0 ),
+        )
+    ]
+)

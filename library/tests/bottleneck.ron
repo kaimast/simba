@@ -1,0 +1,14 @@
+(
+    protocol: "speed_test",
+    network: "bottleneck",
+    timeout: Seconds(
+        warmup: 10,
+        runtime: 10,
+    ),
+    asserts: [
+        Assert(
+            metric: Network(NodeBandwidth(4)),
+            constraint: InRange(min: 10445760, max: 11225760),
+        ),
+    ]
+)

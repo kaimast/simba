@@ -1,0 +1,32 @@
+#! /bin/env python3
+
+''' Runs a local web server to test the WASM UI '''
+
+import os
+import sys
+import http.server as hs
+
+PORT = 8088
+WORK_DIR = "./out"
+
+def _main():
+    os.chdir(WORK_DIR)
+
+    handler = hs.SimpleHTTPRequestHandler
+
+    # Reusing addresses allows restarting the webserver more frequently
+    server = hs.HTTPServer(("", PORT), handler, bind_and_activate=False)
+    server.allow_reuse_address = True
+    server.server_bind()
+    server.server_activate()
+
+    print(f"Set up TCP server at localhost:{PORT}")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("Got SIGTERM")
+        sys.exit(0)
+
+if __name__ == "__main__":
+    _main()

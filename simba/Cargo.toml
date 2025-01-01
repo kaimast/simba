@@ -1,0 +1,41 @@
+[package]
+name = "simba"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Simulating Byzantine Fault-Tolerant Applications"
+
+[dependencies]
+log = { workspace=true }
+rand = { workspace=true, features=["getrandom"] }
+ron = { workspace=true }
+uint = "0.10"
+dashmap =  { workspace=true }
+derivative = "2"
+anyhow = "1"
+derive_more = { version="1.0.0-beta.6", features=["display", "from_str", "add_assign", "mul"] }
+parking_lot = "0.12"
+futures = "0.3"
+async-trait = "0.1"
+getrandom = "0.2"
+num_cpus = "1"
+csv = "1"
+ctrlc = { version="3", features=["termination"], optional=true }
+instant = "0.1"
+serde = { version="1", features=["derive"] }
+tracing = { version="0.1" }
+cow-tree = { path="../cow-tree" }
+fast-float = "0.2"
+tokio = { version = "1", default-features=false, features=["sync", "macros"] }
+asim = { workspace=true }
+struct_iterable = { git="https://github.com/kaimast/rust_struct_iterable.git", branch="custom-traits" }
+
+[dev-dependencies]
+env_logger = "0.11"
+test-log = "0.2"
+
+[features]
+default = []
+all = ["runners"]
+runners = ["ctrlc"]
+wasm = ["getrandom/js", "instant/wasm-bindgen"]

@@ -1,0 +1,14 @@
+(
+    protocol: "speed_test",
+    network: "split",
+    timeout: Seconds(
+        warmup: 10,
+        runtime: 10,
+    ),
+    asserts: [
+        Assert(
+            metric: Network(NodeBandwidth(3)),
+            constraint: InRange(min: 10425760, max: 11425760),
+        ),
+    ]
+)

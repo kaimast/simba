@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install rustc and clippy nightly
+      uses: dtolnay/rust-toolchain@stable
+      with:
+         toolchain: nightly-2024-07-03 # this has to match rust-toolchain.toml
+         components: cargo, rustc, clippy, rustfmt
+    - name: Setup just
+      run: cargo install just
+    - name: Setup rust dependency caching
+      uses: Swatinem/rust-cache@v2
+    - name: Unit Tests
+      run: just unit-tests
+      timeout-minutes: 5
+    - name: Build Cmd
+      run: just BUILDTYPE=release build-cmd
+      timeout-minutes: 10
+    - name: "Network Test: Bottleneck"
+      timeout-minutes: 5
+      run: just BUILDTYPE=release test-bottleneck
+    - name: "Network Test: Split"
+      timeout-minutes: 5
+      run: just BUILDTYPE=release test-split
+    - name: "Integration Test: Ethereum"
+      timeout-minutes: 30
+      run: just BUILDTYPE=release test-ethereum
+    - name: "Integration Test: Practical BFT"
+      timeout-minutes: 20
+      run: just BUILDTYPE=release test-pbft
+    - name: "Lint checks"
+      run: just lint-cmd
+    - name: "Formatting checks"
+      run: cargo fmt --check

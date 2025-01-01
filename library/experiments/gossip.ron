@@ -1,0 +1,21 @@
+(
+    protocol: "gossip",
+    network: "p2p_tiny",
+
+    failures: Some((
+        faulty_nodes: 0.25,
+    )),
+
+    metrics: [
+        BlockPropagationDelay,
+    ],
+
+    data_ranges: [
+        (GossipRetryDelay, LinearInt(start: 200, end: 1_000, step_size: 200)),
+    ],
+
+    timeout: Blocks(
+        warmup: 0,
+        runtime: 1,
+    ),
+)

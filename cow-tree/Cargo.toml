@@ -1,0 +1,10 @@
+[package]
+name = "cow-tree"
+version = "0.1.0"
+edition = "2021"
+
+[dev-dependencies]
+sha3 = "0.10"
+
+[dependencies]
+generic-array = "0.14"

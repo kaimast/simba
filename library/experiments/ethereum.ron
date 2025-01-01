@@ -1,0 +1,16 @@
+(
+    protocol: "ethereum",
+    network: "p2p_medium",
+
+    metrics: [Throughput, Latency, WinRate, BlockSize, OrphanRate],
+
+    data_ranges: [
+        (MaxBlockSize, LinearInt(start: 1_000_000, end: 10_000_000, step_size: 1_000_000)),
+        (NumClients, LinearInt(start: 10_000, end: 100_000, step_size: 10_000)),
+    ],
+
+    timeout: Seconds(
+        warmup: 10800,
+        runtime: 3600,
+    ),
+)

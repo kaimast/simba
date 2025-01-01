@@ -1,0 +1,16 @@
+(
+    protocol: "bitcoin",
+    network: "p2p_medium",
+
+    metrics: [Throughput, WinRate, BlockSize, OrphanRate],
+
+    data_ranges: [
+        (MaxBlockSize, LinearInt(start: 10_000, end: 100_000, step_size: 10_000)),
+    ],
+
+    // Warm up for 5 hours to adjust difficulty
+    timeout: Seconds(
+        warmup: 36000,
+        runtime: 36000,
+    ),
+)
