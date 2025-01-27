@@ -1,13 +1,13 @@
 use std::cmp::Ordering;
 use std::rc::Rc;
 
-use asim::time::{Duration, Time, START_TIME};
+use asim::time::{Duration, START_TIME, Time};
 
 use crate::config::{
     Difficulty, DifficultyAdjustment, IncrementalDifficultyAdjustment,
     NakamotoBlockGenerationConfig,
 };
-use crate::ledger::{DiffTarget, NakamotoBlock, MAX_DIFF_TARGET};
+use crate::ledger::{DiffTarget, MAX_DIFF_TARGET, NakamotoBlock};
 use crate::logic::Block;
 use crate::node::NodeIndex;
 
@@ -43,10 +43,11 @@ struct Ouroboros {
 impl BlockGenerator for ProofOfWork {
     fn should_create_block(&mut self, _idx: NodeIndex) -> bool {
         // TODO should be a function of the node's compute power
+        let mut rng = rand::rng();
 
         let mut value = DiffTarget([0, 0, 0, 0]);
         for idx in 0..4 {
-            value.0[idx] = rand::rngs::OsRng.next_u64();
+            value.0[idx] = rng.next_u64();
         }
 
         value < self.difficulty_target

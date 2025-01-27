@@ -2,16 +2,16 @@ use std::cell::RefCell;
 use std::collections::{BTreeMap, HashSet};
 use std::rc::Rc;
 
+use crate::RcCell;
 use crate::clients::Client;
 use crate::config::{Connectivity, TimeoutConfig};
 use crate::ledger::{ConventionalBlock, ConventionalGlobalLedger, SlotNumber};
 use crate::link::Link;
-use crate::logic::{Block, GlobalLogic, NodeLogic, Transaction, GENESIS_BLOCK, SIGNATURE_SIZE};
+use crate::logic::{Block, GENESIS_BLOCK, GlobalLogic, NodeLogic, SIGNATURE_SIZE, Transaction};
 use crate::message::MessageType;
 use crate::metrics::ChainMetrics;
 use crate::node::NodeIndex;
 use crate::object::ObjectId;
-use crate::RcCell;
 
 use asim::time::{Duration, Time};
 

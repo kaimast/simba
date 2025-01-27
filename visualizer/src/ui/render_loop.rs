@@ -3,12 +3,12 @@ use std::sync::Mutex as StdMutex;
 
 use winit::dpi::PhysicalPosition;
 
-use iced::keyboard::{key, Event as KeyboardEvent, Key};
+use iced::keyboard::{Event as KeyboardEvent, Key, key};
 use iced::mouse::{
     Button as MouseButton, Cursor, Event as MouseEvent, ScrollDelta as MouseScrollDelta,
 };
 use iced::{Event, Font, Pixels};
-use iced_runtime::{program, Debug};
+use iced_runtime::{Debug, program};
 use iced_wgpu::graphics::Viewport;
 use iced_winit::conversion;
 

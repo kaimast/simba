@@ -1,6 +1,6 @@
 use crate::logic::AccountId;
 use crate::logic::Transaction;
-use crate::node::{get_node_logic, Node};
+use crate::node::{Node, get_node_logic};
 use crate::object::{Object, ObjectId};
 
 use std::cell::RefCell;

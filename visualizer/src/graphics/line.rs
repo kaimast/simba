@@ -1,4 +1,4 @@
-use super::{BoundingBox, Drawable, DrawableId, Material, Program, Renderer, Vertex, MAX_Z_INDEX};
+use super::{BoundingBox, Drawable, DrawableId, MAX_Z_INDEX, Material, Program, Renderer, Vertex};
 
 use glam::{Mat4, Vec2, Vec3, Vec4};
 

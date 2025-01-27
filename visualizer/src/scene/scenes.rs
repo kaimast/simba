@@ -1,8 +1,8 @@
-use std::collections::{hash_map, HashMap};
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::collections::{HashMap, hash_map};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 
-use simba::{BlockEvent, BlockId, LinkEvent, Location, NodeEvent, Simulation, GENESIS_BLOCK};
+use simba::{BlockEvent, BlockId, GENESIS_BLOCK, LinkEvent, Location, NodeEvent, Simulation};
 
 use glam::Vec2;
 

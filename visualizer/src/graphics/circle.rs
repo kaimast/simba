@@ -1,5 +1,5 @@
 use crate::graphics::{
-    BoundingBox, Drawable, DrawableId, Material, Program, Renderer, Vertex, MAX_Z_INDEX,
+    BoundingBox, Drawable, DrawableId, MAX_Z_INDEX, Material, Program, Renderer, Vertex,
 };
 
 use std::sync::Arc;

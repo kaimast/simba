@@ -1,4 +1,4 @@
-use super::{BoundingBox, Renderer, MAX_Z_INDEX};
+use super::{BoundingBox, MAX_Z_INDEX, Renderer};
 
 use std::sync::Arc;
 

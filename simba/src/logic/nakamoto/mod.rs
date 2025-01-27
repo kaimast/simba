@@ -4,25 +4,25 @@ use std::rc::Rc;
 
 use asim::time::{Duration, Time};
 
+use crate::RcCell;
 use crate::clients::Client;
 use crate::config::{Connectivity, NakamotoBlockGenerationConfig, TimeoutConfig};
 use crate::ledger::{NakamotoBlock, NakamotoGlobalLedger};
 use crate::link::Link;
 use crate::logic::{
-    Block, BlockId, GlobalLogic, NodeLogic, Transaction, TransactionId, GENESIS_BLOCK, HASH_SIZE,
-    NUM_SIZE, SIGNATURE_SIZE,
+    Block, BlockId, GENESIS_BLOCK, GlobalLogic, HASH_SIZE, NUM_SIZE, NodeLogic, SIGNATURE_SIZE,
+    Transaction, TransactionId,
 };
 use crate::message::MessageType;
 use crate::metrics::ChainMetrics;
 use crate::node::NodeIndex;
 use crate::object::ObjectId;
-use crate::RcCell;
 
 mod node;
 pub use node::NakamotoNodeLogic;
 
 mod block_generator;
-use block_generator::{make_block_generator, BlockGenerator};
+use block_generator::{BlockGenerator, make_block_generator};
 
 #[derive(Clone, Debug)]
 pub enum NakamotoMessage {

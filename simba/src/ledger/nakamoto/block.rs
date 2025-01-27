@@ -9,7 +9,7 @@ use derivative::Derivative;
 
 use crate::config::Difficulty;
 use crate::logic::{
-    AccountId, AccountState, Block, BlockId, TransactionId, HASH_SIZE, NUM_SIZE, SIGNATURE_SIZE,
+    AccountId, AccountState, Block, BlockId, HASH_SIZE, NUM_SIZE, SIGNATURE_SIZE, TransactionId,
 };
 
 #[derive(Derivative)]

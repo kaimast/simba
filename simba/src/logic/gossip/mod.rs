@@ -8,12 +8,12 @@ use asim::time::{Duration, Time};
 
 use derivative::Derivative;
 
+use crate::Connectivity;
 use crate::logic::{BlockId, Client, GlobalLogic, Link, NodeLogic, TimeoutConfig};
 use crate::message::MessageType;
 use crate::metrics::ChainMetrics;
 use crate::node::NodeIndex;
 use crate::object::ObjectId;
-use crate::Connectivity;
 
 mod node;
 pub use node::GossipNodeLogic;

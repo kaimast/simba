@@ -1,4 +1,4 @@
-use std::sync::{mpsc, OnceLock};
+use std::sync::{OnceLock, mpsc};
 
 use crate::config::TimeoutConfig;
 use crate::logic::BlockId;

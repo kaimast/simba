@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::config::Difficulty;
-use crate::logic::{Block, Transaction, TransactionId, GENESIS_BLOCK, GENESIS_HEIGHT};
+use crate::logic::{Block, GENESIS_BLOCK, GENESIS_HEIGHT, Transaction, TransactionId};
 
 use super::{NakamotoBlock, NakamotoNodeLedger};
 

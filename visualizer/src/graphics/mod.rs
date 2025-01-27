@@ -28,8 +28,8 @@ use winit::window::Window;
 
 use wgpu::util::DeviceExt;
 
-use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
+use std::sync::atomic::AtomicU64;
 
 use glam::{Mat4, Vec2};
 

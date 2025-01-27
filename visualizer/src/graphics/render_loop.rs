@@ -1,6 +1,6 @@
 use std::process::exit;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use instant::Instant;
 
@@ -229,18 +229,15 @@ impl<'a> RenderLoop<'a> {
             .first()
             .expect("No supported texture format found");
 
-        surface.configure(
-            device,
-            &SurfaceConfiguration {
-                usage: TextureUsages::RENDER_ATTACHMENT,
-                format,
-                width: size.width,
-                height: size.height,
-                alpha_mode: wgpu::CompositeAlphaMode::Auto,
-                present_mode: wgpu::PresentMode::AutoVsync,
-                view_formats: vec![],
-                desired_maximum_frame_latency: 2,
-            },
-        )
+        surface.configure(device, &SurfaceConfiguration {
+            usage: TextureUsages::RENDER_ATTACHMENT,
+            format,
+            width: size.width,
+            height: size.height,
+            alpha_mode: wgpu::CompositeAlphaMode::Auto,
+            present_mode: wgpu::PresentMode::AutoVsync,
+            view_formats: vec![],
+            desired_maximum_frame_latency: 2,
+        })
     }
 }

@@ -92,7 +92,7 @@ impl Statistics {
         let mut stats_file = self.stats_file.borrow_mut().take();
 
         // Create CSV header
-        if let Some(ref mut stats_file) = &mut stats_file {
+        if let &mut Some(ref mut stats_file) = &mut stats_file {
             log::debug!("Writing statistics to file");
 
             let global_stats = GlobalStatistics::default();
@@ -126,7 +126,7 @@ impl Statistics {
                 global_stats += data;
             }
 
-            if let Some(ref mut stats_file) = &mut stats_file {
+            if let &mut Some(ref mut stats_file) = &mut stats_file {
                 let global_stats = GlobalStatistics::default();
                 let mut values = vec![asim::time::now().to_millis().to_string()];
 

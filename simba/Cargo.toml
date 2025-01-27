@@ -1,13 +1,14 @@
 [package]
 name = "simba"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 description = "Simulating Byzantine Fault-Tolerant Applications"
 
 [dependencies]
 log = { workspace=true }
-rand = { workspace=true, features=["getrandom"] }
+rand = { workspace=true }
+getrandom = { workspace=true }
 ron = { workspace=true }
 uint = "0.10"
 dashmap =  { workspace=true }
@@ -17,7 +18,6 @@ derive_more = { version="1.0.0-beta.6", features=["display", "from_str", "add_as
 parking_lot = "0.12"
 futures = "0.3"
 async-trait = "0.1"
-getrandom = "0.2"
 num_cpus = "1"
 csv = "1"
 ctrlc = { version="3", features=["termination"], optional=true }
@@ -38,4 +38,4 @@ test-log = "0.2"
 default = []
 all = ["runners"]
 runners = ["ctrlc"]
-wasm = ["getrandom/js", "instant/wasm-bindgen"]
+wasm = ["getrandom/wasm_js", "instant/wasm-bindgen"]

@@ -106,7 +106,7 @@ impl Default for ProtocolConfiguration {
 impl ProtocolConfiguration {
     pub fn set(&mut self, parameter: &ParameterType, value: ParameterValue) {
         match self {
-            Self::NakamotoConsensus {
+            &mut Self::NakamotoConsensus {
                 ref mut max_block_size,
                 ..
             } => match parameter {
@@ -118,7 +118,7 @@ impl ProtocolConfiguration {
                 | ParameterType::NumClients => {}
                 _ => panic!("Parameter not supported"),
             },
-            Self::PracticalBFT {
+            &mut Self::PracticalBFT {
                 ref mut max_block_size,
                 ..
             } => match parameter {
@@ -130,7 +130,7 @@ impl ProtocolConfiguration {
                 | ParameterType::NumClients => {}
                 _ => panic!("Parameter not supported"),
             },
-            Self::Gossip {
+            &mut Self::Gossip {
                 ref mut retry_delay,
                 ref mut block_size,
             } => match parameter {
@@ -142,8 +142,8 @@ impl ProtocolConfiguration {
                 }
                 _ => panic!("Parameter not supported"),
             },
-            Self::SpeedTest { .. } => unimplemented!(),
-            Self::Snowball {
+            &mut Self::SpeedTest { .. } => unimplemented!(),
+            &mut Self::Snowball {
                 ref mut acceptance_threshold,
                 ..
             } => match parameter {
@@ -174,7 +174,7 @@ impl NetworkConfiguration {
 
     pub fn set(&mut self, parameter: &ParameterType, value: ParameterValue) {
         match self {
-            Self::Random {
+            &mut Self::Random {
                 ref mut num_mining_nodes,
                 ref mut num_non_mining_nodes,
                 ref mut workload,
@@ -200,7 +200,7 @@ impl NetworkConfiguration {
                         .expect("Invalid parameter value for \"NumClients\"");
                 }
             },
-            Self::PreDefined { .. } => match parameter {
+            &mut Self::PreDefined { .. } => match parameter {
                 ParameterType::BlockSize
                 | ParameterType::MaxBlockSize
                 | ParameterType::GossipRetryDelay
