@@ -1,4 +1,3 @@
-#![feature(async_closure)]
 #![allow(clippy::bool_to_int_with_if)]
 #![allow(clippy::arc_with_non_send_sync)]
 

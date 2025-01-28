@@ -1,6 +1,6 @@
 #![feature(trait_alias)]
 
-use generic_array::{typenum, GenericArray};
+use generic_array::{GenericArray, typenum};
 
 mod node;
 use node::{FrozenNode, Node};
