@@ -12,12 +12,13 @@ members = [
 [workspace.dependencies]
 asim = { git="http://github.com/kaimast/asim.git" }
 log = "0.4"
-rand = "0.8"
+rand = "0.9"
+getrandom = "0.3"
 ron = "0.8"
 console-subscriber = "0.4"
 dashmap = "6"
 #winit = "0.30"
-winit = { git = "https://github.com/iced-rs/winit.git", rev="254d6b3420ce4e674f516f7a2bd440665e05484d" }
+winit = { git = "https://github.com/iced-rs/winit.git", rev="11414b6aa45699f038114e61b4ddf5102b2d3b4b" }
 wgpu = { version="23", features=["spirv"] }
 iced_aw = { version="0.11", default-features=false }
 #iced = "0.13"
@@ -50,4 +51,4 @@ iced_widget = { git="https://github.com/iced-rs/iced.git"}
 iced_winit = { git="https://github.com/iced-rs/iced.git"}
 iced_core = { git="https://github.com/iced-rs/iced.git"}
 iced_wgpu = { git="https://github.com/iced-rs/iced.git"}
-winit = { git = "https://github.com/iced-rs/winit.git", rev="254d6b3420ce4e674f516f7a2bd440665e05484d" }
+winit = { git = "https://github.com/iced-rs/winit.git", rev="11414b6aa45699f038114e61b4ddf5102b2d3b4b" }

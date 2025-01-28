@@ -1,7 +1,7 @@
 use crate::events::{Event, LinkEvent};
 use crate::node::{Node, NodeData};
 use crate::object::{Object, ObjectId};
-use crate::{emit_event, Message};
+use crate::{Message, emit_event};
 
 use std::rc::Rc;
 

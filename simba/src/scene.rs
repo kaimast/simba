@@ -3,7 +3,7 @@ use crate::events::{Event, LinkEvent, NodeEvent};
 use crate::link::Link;
 use crate::node::{Node, NodeIndex};
 use crate::object::{Object, ObjectId, ObjectMap};
-use crate::{emit_event, RcCell};
+use crate::{RcCell, emit_event};
 
 use std::cell::Ref;
 use std::cell::RefCell;

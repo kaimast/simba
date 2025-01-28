@@ -1,8 +1,8 @@
 // Clippy bug
 #![allow(clippy::needless_return)]
 
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use anyhow::Context;
 

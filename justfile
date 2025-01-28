@@ -10,11 +10,10 @@ all: build #generate-web
 
 install: build
     cargo install {{BUILD_FLAGS}} --path=./simba-cmd --locked
-    cargo install {{BUILD_FLAGS}} --path=./visualizer --locked
+    cargo install {{BUILD_FLAGS}} --path=./native-gui --locked
 
 lint: lint-cmd lint-native validate-shaders #lint-web
 build: build-native build-cmd #build-web
-
 
 check:
     cargo check --package=simba-native-gui

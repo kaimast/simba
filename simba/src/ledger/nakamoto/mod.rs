@@ -6,18 +6,18 @@ use asim::time::Time;
 
 use cow_tree::FrozenCowTree;
 
-use rand::prelude::SliceRandom;
-
 use crate::config::Difficulty;
 use crate::emit_event;
 use crate::events::{BlockEvent, Event};
 use crate::logic::{
-    AccountId, AccountState, Block, BlockId, Transaction, TransactionId, GENESIS_BLOCK,
-    GENESIS_HEIGHT,
+    AccountId, AccountState, Block, BlockId, GENESIS_BLOCK, GENESIS_HEIGHT, Transaction,
+    TransactionId,
 };
 
 mod block;
 pub use block::NakamotoBlock;
+
+use rand::prelude::IteratorRandom;
 
 use super::{GlobalLedger, NodeLedger};
 
@@ -392,10 +392,10 @@ impl NakamotoNodeLedger {
             }
         }
 
-        let mut rng = rand::thread_rng();
-        let block = longest_forks.choose(&mut rng).unwrap();
+        let mut rng = rand::rng();
+        let block = longest_forks.into_iter().choose(&mut rng).unwrap();
 
-        (*block, max_length)
+        (block, max_length)
     }
 
     pub fn get_forks(&self) -> &HashMap<BlockId, u64> {

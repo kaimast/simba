@@ -11,13 +11,14 @@ use rand::Rng;
 
 use super::SnowballMessage;
 
-use rand::seq::SliceRandom;
+use rand::seq::IteratorRandom;
+
 use serde::{Deserialize, Serialize};
 
+use crate::Message;
 use crate::logic::{NodeLogic, Transaction};
 use crate::node::Node;
 use crate::object::{Object, ObjectId};
-use crate::Message;
 
 #[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
 pub enum Color {
@@ -84,13 +85,15 @@ impl NodeState {
         log::trace!("Running SnowballNodeState:start_next_sample()");
         // self.current_candidate is col in paper, not using any col_0 for initial value
         let nodes = node.get_peers(); //get all nodes in network
-        let mut rng = &mut rand::thread_rng();
+        let mut rng = &mut rand::rng();
         assert!(sample_size as usize <= nodes.len());
-        let sampled_nodes = nodes.choose_multiple(&mut rng, sample_size as usize);
+        let sampled_nodes = nodes
+            .into_iter()
+            .choose_multiple(&mut rng, sample_size as usize);
 
         for peer_id in sampled_nodes {
             node.send_to(
-                peer_id,
+                &peer_id,
                 Message::Snowball(SnowballMessage::Query(self.current_candidate)),
             );
         }
@@ -240,8 +243,8 @@ impl SnowballNodeLogic {
         log::debug!("Created SnowballNodeLogic");
 
         // generate a random number between 0 and 3
-        let mut rng = rand::thread_rng();
-        let random_number: u8 = rng.gen_range(0..=2);
+        let mut rng = rand::rng();
+        let random_number: u8 = rng.random_range(0..=2);
         let current_candidate = match random_number {
             1 => Color::Red,
             2 => Color::Blue,

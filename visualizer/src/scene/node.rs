@@ -1,8 +1,8 @@
 use simba::{NodeIndex, ObjectId as SimObjectId, Simulation};
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::graphics::{CircleStyle, Drawable, Graphics};
 use crate::scene::ObjectId;

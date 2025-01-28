@@ -1,7 +1,7 @@
 use crate::ledger::{
     ConventionalBlock, ConventionalGlobalLedger, ConventionalNodeLedger, SlotNumber,
 };
-use crate::logic::{Block, NodeLogic, Transaction, GENESIS_BLOCK};
+use crate::logic::{Block, GENESIS_BLOCK, NodeLogic, Transaction};
 use crate::node::{Node, NodeIndex};
 use crate::object::{Object, ObjectId};
 use crate::{Message, RcCell};

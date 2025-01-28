@@ -105,7 +105,7 @@ impl Default for ProtocolConfiguration {
 
 impl ProtocolConfiguration {
     pub fn set(&mut self, parameter: &ParameterType, value: ParameterValue) {
-        match self {
+        match *self {
             Self::NakamotoConsensus {
                 ref mut max_block_size,
                 ..
@@ -173,7 +173,7 @@ impl NetworkConfiguration {
     }
 
     pub fn set(&mut self, parameter: &ParameterType, value: ParameterValue) {
-        match self {
+        match *self {
             Self::Random {
                 ref mut num_mining_nodes,
                 ref mut num_non_mining_nodes,

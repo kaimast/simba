@@ -1,7 +1,7 @@
 use crate::config::NakamotoBlockGenerationConfig;
 use crate::ledger::{NakamotoBlock, NakamotoGlobalLedger, NakamotoNodeLedger};
 use crate::logic::{
-    AccountId, Block, BlockId, NodeLogic, Transaction, TransactionId, GENESIS_BLOCK,
+    AccountId, Block, BlockId, GENESIS_BLOCK, NodeLogic, Transaction, TransactionId,
 };
 use crate::node::Node;
 use crate::object::ObjectId;
@@ -14,7 +14,7 @@ use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 use super::NakamotoMessage;
-use super::{make_block_generator, BlockGenerator};
+use super::{BlockGenerator, make_block_generator};
 
 struct NodeState {
     local_ledger: NakamotoNodeLedger,

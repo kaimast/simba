@@ -21,7 +21,7 @@ impl Failures {
         //FIXME node0 still has a special role in some protocols
         for idx in 1..num_nodes {
             let faulty = {
-                let rand = rand::thread_rng().gen_range(0.0..1.0);
+                let rand = rand::rng().random_range(0.0..1.0);
                 rand < config.faulty_nodes
             };
 

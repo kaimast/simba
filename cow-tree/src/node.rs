@@ -1,4 +1,4 @@
-use super::{Value, BITS_PER_NODE};
+use super::{BITS_PER_NODE, Value};
 
 use std::rc::Rc;
 
@@ -80,11 +80,14 @@ impl<V: Value> Node<V> {
     pub fn take_child(&mut self, idx: u8) -> Option<Box<Self>> {
         assert!((idx as usize) < CHILDREN_PER_BRANCH);
 
-        match self {
+        match *self {
             Self::Leaf(_) => panic!("Cannot get child of leaf!"),
             Self::Branch { ref mut children } => children[idx as usize].take(),
-            Self::Extension { bits, child } => {
-                if *bits == idx {
+            Self::Extension {
+                bits,
+                ref mut child,
+            } => {
+                if bits == idx {
                     child.take()
                 } else {
                     None
@@ -131,7 +134,7 @@ impl<V: Value> Node<V> {
     pub fn set_child(&mut self, idx: u8, new_child: Box<Self>) {
         assert!((idx as usize) < CHILDREN_PER_BRANCH);
 
-        match self {
+        match *self {
             Self::Leaf(_) => panic!("Cannot set child of leaf!"),
             Self::Branch { ref mut children } => {
                 children[idx as usize] = Some(new_child);
@@ -140,7 +143,7 @@ impl<V: Value> Node<V> {
                 bits,
                 ref mut child,
             } => {
-                if *bits != idx {
+                if bits != idx {
                     panic!("Cannot set child");
                 }
 

@@ -2,21 +2,21 @@ use std::cmp::Ordering;
 use std::fs::File;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
-use std::sync::{mpsc, Arc, OnceLock};
+use std::sync::{Arc, OnceLock, mpsc};
 
 use dashmap::DashMap;
 
 use instant::Instant;
 
-use asim::time::{Duration, Time, START_TIME};
+use asim::time::{Duration, START_TIME, Time};
 
 use parking_lot::{Condvar, Mutex};
 
 use crate::clients::Client;
 use crate::config::{Connectivity, NetworkConfiguration, ProtocolConfiguration, TimeoutConfig};
 use crate::events::{
-    BlockEvent, Command, Event, LinkEvent, NodeEvent, OpRequest, OpResult, StatisticsEvent,
-    EVENT_HANDLER,
+    BlockEvent, Command, EVENT_HANDLER, Event, LinkEvent, NodeEvent, OpRequest, OpResult,
+    StatisticsEvent,
 };
 use crate::failures::Failures;
 use crate::link::create_link;
@@ -26,7 +26,7 @@ use crate::logic::{
     SnowballGlobalLogic, SpeedTestGlobalLogic,
 };
 use crate::message::MessageType;
-use crate::node::{create_node, Node, NodeIndex};
+use crate::node::{Node, NodeIndex, create_node};
 use crate::object::{Object, ObjectId};
 use crate::scene::Scene;
 use crate::stats::{GlobalStatistics, NodeStatistics, Statistics};
@@ -727,7 +727,7 @@ impl SimulationInner {
                 }
             }
             NetworkConfiguration::PreDefined {
-                clients: ref client_cfgs,
+                clients: client_cfgs,
                 nodes: node_cfgs,
                 links: link_cfgs,
             } => {
@@ -1066,7 +1066,10 @@ impl SimulationInner {
                 // Slow down if simulation was too fast
                 if real_elapsed < min_time {
                     let sleep_time = min_time - real_elapsed;
-                    log::trace!("Elapsed time was {real_elapsed:?}, but min time is {min_time:?} because simulation advanced by {virtual_elapsed:?}. Sleeping for {}us", (sleep_time.as_micros() as f64)/1000.0);
+                    log::trace!(
+                        "Elapsed time was {real_elapsed:?}, but min time is {min_time:?} because simulation advanced by {virtual_elapsed:?}. Sleeping for {}us",
+                        (sleep_time.as_micros() as f64) / 1000.0
+                    );
                     std::thread::sleep(sleep_time);
                 }
             }

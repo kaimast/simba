@@ -11,7 +11,7 @@ use derivative::Derivative;
 
 use crate::emit_event;
 use crate::events::{BlockEvent, Event};
-use crate::logic::{AccountState, Block, BlockId, Transaction, TransactionId, SIGNATURE_SIZE};
+use crate::logic::{AccountState, Block, BlockId, SIGNATURE_SIZE, Transaction, TransactionId};
 use crate::node::NodeIndex;
 
 use asim::time::Time;

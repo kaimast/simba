@@ -6,12 +6,12 @@ use asim::network::NetworkMessage;
 
 use serde::{Deserialize, Serialize};
 
+use crate::Message;
 use crate::clients::Client;
 use crate::link::Bandwidth;
 use crate::logic::{AccountId, NodeLogic, Transaction};
 use crate::object::ObjectId;
 use crate::stats::NodeStatsCollector;
-use crate::Message;
 
 pub type NodeIndex = u32;
 
