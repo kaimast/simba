@@ -78,7 +78,7 @@ impl BlockGenerator for ProofOfWork {
 
         let new_difficulty = match self.difficulty_adjustment {
             DifficultyAdjustment::PeriodBased { window_size } => {
-                if chain_length % window_size == 0 {
+                if chain_length.is_multiple_of(window_size) {
                     log::debug!("Recomputing difficulty target");
                     //TODO re32)compute
                     self.difficulty

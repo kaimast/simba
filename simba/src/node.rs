@@ -139,7 +139,7 @@ pub fn create_node(
 }
 
 impl NodeData {
-    pub fn get_statistics(&self) -> RefMut<NodeStatsCollector> {
+    pub fn get_statistics(&self) -> RefMut<'_, NodeStatsCollector> {
         self.statistics.borrow_mut()
     }
 

@@ -30,6 +30,7 @@ mod ethereum2;
 //pub use ethereum2::*;
 
 #[derive(Default, Debug, Clone)]
+#[allow(dead_code)]
 pub struct DummyLogic {}
 
 pub type BlockId = u128;

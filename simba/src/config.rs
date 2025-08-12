@@ -89,6 +89,10 @@ pub enum ProtocolConfiguration {
         sample_size_weighted: f64,
         /// Number of sampled nodes to form quorum in each epoch: alpha/k
         query_threshold_weighted: f64,
+        /// Heartbeat interval in milliseconds for node liveness detection
+        heartbeat_interval: u64,
+        /// Maximum number of rounds before giving up
+        max_rounds: u32,
     },
 }
 
@@ -145,6 +149,8 @@ impl ProtocolConfiguration {
             Self::SpeedTest { .. } => unimplemented!(),
             Self::Snowball {
                 ref mut acceptance_threshold,
+                ref mut heartbeat_interval,
+                ref mut max_rounds,
                 ..
             } => match parameter {
                 ParameterType::MaxBlockSize => unimplemented!(),
@@ -153,6 +159,12 @@ impl ProtocolConfiguration {
                 | ParameterType::NumClients => {}
                 ParameterType::AcceptanceThreshold => {
                     *acceptance_threshold = value.try_into().unwrap();
+                }
+                ParameterType::HeartbeatInterval => {
+                    *heartbeat_interval = value.try_into().unwrap();
+                }
+                ParameterType::MaxRounds => {
+                    *max_rounds = value.try_into().unwrap();
                 }
                 _ => panic!("Parameter not supported"),
             },
@@ -183,7 +195,9 @@ impl NetworkConfiguration {
                 ParameterType::BlockSize
                 | ParameterType::MaxBlockSize
                 | ParameterType::GossipRetryDelay
-                | ParameterType::AcceptanceThreshold => {}
+                | ParameterType::AcceptanceThreshold
+                | ParameterType::HeartbeatInterval
+                | ParameterType::MaxRounds => {}
                 ParameterType::NumMiningNodes => {
                     *num_mining_nodes = value
                         .try_into()
@@ -204,7 +218,9 @@ impl NetworkConfiguration {
                 ParameterType::BlockSize
                 | ParameterType::MaxBlockSize
                 | ParameterType::GossipRetryDelay
-                | ParameterType::AcceptanceThreshold => {}
+                | ParameterType::AcceptanceThreshold
+                | ParameterType::HeartbeatInterval
+                | ParameterType::MaxRounds => {}
                 ParameterType::NumMiningNodes
                 | ParameterType::NumNonMiningNodes
                 | ParameterType::NumClients => {
@@ -303,6 +319,10 @@ pub enum ParameterType {
     AcceptanceThreshold,
     /// After what time should we try fetching data from another peer
     GossipRetryDelay,
+    /// Heartbeat interval in milliseconds for node liveness detection
+    HeartbeatInterval,
+    /// Maximum number of rounds before giving up
+    MaxRounds,
 }
 
 impl TryFrom<&str> for ParameterType {
@@ -385,11 +405,10 @@ impl TryInto<usize> for ParameterValue {
     type Error = ();
 
     fn try_into(self) -> Result<usize, ()> {
-        if let Self::Int(i) = self {
-            if i >= 0 {
+        if let Self::Int(i) = self
+            && i >= 0 {
                 return Ok(i as usize);
             }
-        }
 
         Err(())
     }
@@ -399,11 +418,23 @@ impl TryInto<u32> for ParameterValue {
     type Error = ();
 
     fn try_into(self) -> Result<u32, ()> {
-        if let Self::Int(i) = self {
-            if i >= 0 {
+        if let Self::Int(i) = self
+            && i >= 0 {
                 return Ok(i as u32);
             }
-        }
+
+        Err(())
+    }
+}
+
+impl TryInto<u64> for ParameterValue {
+    type Error = ();
+
+    fn try_into(self) -> Result<u64, ()> {
+        if let Self::Int(i) = self
+            && i >= 0 {
+                return Ok(i as u64);
+            }
 
         Err(())
     }

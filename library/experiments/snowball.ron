@@ -4,10 +4,14 @@
 
     metrics: [
         Throughput,
+        Latency,
+        NetworkMessages,
     ],
 
     data_ranges: [
-        (AcceptanceThreshold, LinearInt(start: 10, end: 100, step_size: 10)),
+        (AcceptanceThreshold, LinearInt(start: 5, end: 50, step_size: 5)),
+        (HeartbeatInterval, LinearInt(start: 500, end: 2000, step_size: 500)),
+        (MaxRounds, LinearInt(start: 500, end: 2000, step_size: 500)),
     ],
 
     timeout: Blocks(

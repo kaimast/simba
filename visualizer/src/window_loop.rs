@@ -58,7 +58,7 @@ impl WinitHandler for ApplicationHandler {
         let mut scale_factor = 1.0;
 
         match window_event {
-            WindowEvent::CloseRequested { .. } | WindowEvent::Destroyed { .. } => {
+            WindowEvent::CloseRequested | WindowEvent::Destroyed => {
                 log::debug!("Close requested. Shutting down...");
                 return;
             }

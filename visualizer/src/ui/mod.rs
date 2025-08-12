@@ -43,6 +43,7 @@ pub enum ObjectPropertyUnit {
 }
 
 impl ObjectPropertyUnit {
+    #[allow(dead_code)]
     fn get_suffix(&self) -> &str {
         match self {
             Self::BitsPerSecond => "bits/s",

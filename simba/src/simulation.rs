@@ -536,11 +536,15 @@ impl SimulationInner {
                 acceptance_threshold,
                 sample_size_weighted,
                 query_threshold_weighted,
+                heartbeat_interval,
+                max_rounds,
             } => SnowballGlobalLogic::instantiate(
                 failures.num_correct_nodes(),
                 acceptance_threshold,
                 sample_size_weighted,
                 query_threshold_weighted,
+                heartbeat_interval,
+                max_rounds,
             ),
         }
     }

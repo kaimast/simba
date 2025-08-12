@@ -1,4 +1,5 @@
 UNRELEASED (0.2)
+    - Support for Snowball protocol (simplified Avalanche)
     - Updated to Rust 2024
 
 0.1:
