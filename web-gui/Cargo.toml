@@ -23,3 +23,6 @@ wasm-bindgen = "0.2"
 instant = "0.1"
 log = "0.4"
 console_log = { version="1", features=["color"] }
+
+[package.metadata.cargo-machete]
+ignored = ["getrandom"]

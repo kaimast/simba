@@ -20,6 +20,8 @@ struct ApplicationHandler {
     graphics: Arc<Graphics>,
     scene_mgr: Arc<SceneManager>,
     cursor_position: Arc<CursorPosition>,
+    modifiers: ModifiersState,
+    scale_factor: f64,
 }
 
 impl WindowLoop {
@@ -37,6 +39,8 @@ impl WindowLoop {
             graphics,
             scene_mgr,
             cursor_position,
+            modifiers: ModifiersState::default(),
+            scale_factor: 1.0,
         };
 
         winit_loop
@@ -50,44 +54,45 @@ impl WinitHandler for ApplicationHandler {
 
     fn window_event(
         &mut self,
-        _event_loop: &ActiveEventLoop,
+        event_loop: &ActiveEventLoop,
         _window_id: WindowId,
         window_event: WindowEvent,
     ) {
-        let mut modifiers = ModifiersState::default();
-        let mut scale_factor = 1.0;
-
-        match window_event {
-            WindowEvent::CloseRequested { .. } | WindowEvent::Destroyed { .. } => {
+        // Handle window-specific events first
+        match &window_event {
+            WindowEvent::CloseRequested | WindowEvent::Destroyed => {
                 log::debug!("Close requested. Shutting down...");
-                return;
+                event_loop.exit();
             }
             WindowEvent::ModifiersChanged(new_modifiers) => {
-                modifiers = new_modifiers.state();
+                self.modifiers = new_modifiers.state();
             }
             WindowEvent::CursorMoved { position, .. } => {
                 let mut lock = self.cursor_position.lock().unwrap();
-                *lock = position;
+                *lock = *position;
             }
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new_val,
                 ..
             } => {
-                log::debug!("Scale factor changed from {scale_factor} to {new_val}");
-                scale_factor = new_val;
-                self.graphics.get_renderer().set_scale_factor(scale_factor);
+                log::debug!("Scale factor changed to {new_val}");
+                self.scale_factor = *new_val;
+                self.graphics.get_renderer().set_scale_factor(*new_val);
             }
             WindowEvent::Resized(new_size) => {
                 log::debug!("Window resized to {new_size:?}");
-                self.graphics.get_renderer().set_window_size(new_size);
+                self.graphics.get_renderer().set_window_size(*new_size);
                 self.scene_mgr.notify_resize();
             }
             _ => {}
         }
 
-        if let Some(event) =
-            iced_winit::conversion::window_event(window_event, scale_factor, modifiers)
-        {
+        // Convert window event to iced event for UI processing
+        if let Some(event) = iced_winit::conversion::window_event(
+            window_event,
+            self.scale_factor as f32,
+            self.modifiers,
+        ) {
             self.ui_events.lock().unwrap().push(event);
         }
     }

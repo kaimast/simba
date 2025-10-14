@@ -1,6 +1,8 @@
 #![feature(trait_alias)]
+// Remove after upgrading to generic-array 1.0
+#![allow(deprecated)]
 
-use generic_array::{GenericArray, typenum};
+use generic_array::{typenum, GenericArray};
 
 mod node;
 use node::{FrozenNode, Node};
@@ -33,7 +35,7 @@ impl<V: Value> CowTree<V> {
     fn get_index(key: &Hash, step: usize) -> u8 {
         let byte: u8 = key[step / 2];
 
-        if step % 2 == 0 {
+        if step.is_multiple_of(2) {
             // Get lower 4 bits
             byte & 0x0F
         } else {

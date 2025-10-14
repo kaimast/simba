@@ -29,8 +29,8 @@ pub use snowball::*;
 mod ethereum2;
 //pub use ethereum2::*;
 
-#[derive(Default, Debug, Clone)]
-pub struct DummyLogic {}
+//#[derive(Default, Debug, Clone)]
+//pub struct DummyLogic {}
 
 pub type BlockId = u128;
 pub type TransactionId = u128;
@@ -117,7 +117,7 @@ pub trait GlobalLogic {
     async fn wait_for_blocks(&self, blocks: u64);
 }
 
-#[async_trait::async_trait(?Send)]
+/*#[async_trait::async_trait(?Send)]
 impl NodeLogic for DummyLogic {
     async fn run(&self, _node: Rc<Node>, _is_mining: bool) {}
     fn init(&self, _node: Rc<Node>) {}
@@ -129,4 +129,4 @@ impl NodeLogic for DummyLogic {
         _source: Option<ObjectId>,
     ) {
     }
-}
+}*/

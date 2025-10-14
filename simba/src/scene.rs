@@ -63,15 +63,15 @@ impl Scene {
         self.clients.borrow_mut().push(client);
     }
 
-    pub fn get_links(&self) -> Ref<BTreeMap<ObjectId, Rc<Link>>> {
+    pub fn get_links(&self) -> Ref<'_, BTreeMap<ObjectId, Rc<Link>>> {
         self.links.borrow()
     }
 
-    pub fn get_nodes(&self) -> Ref<BTreeMap<NodeIndex, Rc<Node>>> {
+    pub fn get_nodes(&self) -> Ref<'_, BTreeMap<NodeIndex, Rc<Node>>> {
         self.nodes.borrow()
     }
 
-    pub fn get_clients(&self) -> Ref<Vec<Rc<Client>>> {
+    pub fn get_clients(&self) -> Ref<'_, Vec<Rc<Client>>> {
         self.clients.borrow()
     }
 

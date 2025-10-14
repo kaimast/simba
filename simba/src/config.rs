@@ -385,11 +385,10 @@ impl TryInto<usize> for ParameterValue {
     type Error = ();
 
     fn try_into(self) -> Result<usize, ()> {
-        if let Self::Int(i) = self {
-            if i >= 0 {
+        if let Self::Int(i) = self
+            && i >= 0 {
                 return Ok(i as usize);
             }
-        }
 
         Err(())
     }
@@ -399,11 +398,10 @@ impl TryInto<u32> for ParameterValue {
     type Error = ();
 
     fn try_into(self) -> Result<u32, ()> {
-        if let Self::Int(i) = self {
-            if i >= 0 {
+        if let Self::Int(i) = self
+            && i >= 0 {
                 return Ok(i as u32);
             }
-        }
 
         Err(())
     }

@@ -5,12 +5,13 @@ use winit::dpi::PhysicalPosition;
 
 use iced::keyboard::{Event as KeyboardEvent, Key, key};
 use iced::mouse::{
-    Button as MouseButton, Cursor, Event as MouseEvent, ScrollDelta as MouseScrollDelta,
+    Button as MouseButton, Event as MouseEvent, ScrollDelta as MouseScrollDelta,
 };
 use iced::{Event, Font, Pixels};
-use iced_runtime::{Debug, program};
 use iced_wgpu::graphics::Viewport;
 use iced_winit::conversion;
+use iced_winit::core::{mouse, renderer};
+use iced_winit::runtime::user_interface::{self, UserInterface};
 
 use simba::Simulation;
 
@@ -23,12 +24,13 @@ pub struct UiRenderLoop {
     renderer: Arc<Renderer>,
     messages: Arc<UiMessages>,
     events: Arc<UiEvents>,
-    state: program::State<UiLogic>,
+    controls: UiLogic,
     cursor_position: Arc<StdMutex<PhysicalPosition<f64>>>,
     ui_renderer: iced_wgpu::Renderer,
     clipboard: iced_winit::Clipboard,
     scene_manager: Arc<SceneManager>,
-    engine: iced_wgpu::Engine,
+    cache: user_interface::Cache,
+    cursor: mouse::Cursor,
 }
 
 impl UiRenderLoop {
@@ -43,36 +45,22 @@ impl UiRenderLoop {
         scene_manager: Arc<SceneManager>,
     ) -> Self {
         let clipboard = iced_winit::Clipboard::connect(window);
-        let viewport = {
-            let geometry = renderer.get_geometry();
-            let iced_size =
-                iced::Size::new(geometry.window_size.width, geometry.window_size.height);
-            Viewport::with_physical_size(iced_size, geometry.scale_factor)
-        };
 
-        let device = renderer.get_device();
+        let device = renderer.get_device().clone();
+        let queue = renderer.get_render_queue().clone();
 
         let engine = iced_wgpu::Engine::new(
             renderer.get_adapter(),
             device,
-            renderer.get_render_queue(),
+            queue,
             renderer.get_texture_format(),
-            None,
+            None, // No antialiasing
         );
 
-        let mut ui_renderer =
-            iced_wgpu::Renderer::new(device, &engine, Font::with_name("Fira Sans"), Pixels(16.0));
+        let ui_renderer =
+            iced_wgpu::Renderer::new(engine, Font::with_name("Fira Sans"), Pixels(16.0));
 
-        let mut debug = Debug::new();
-
-        let ui_logic = UiLogic::new(simulation, scene_manager.clone(), messages.clone());
-
-        let state = program::State::new(
-            ui_logic,
-            viewport.logical_size(),
-            &mut ui_renderer,
-            &mut debug,
-        );
+        let controls = UiLogic::new(simulation, scene_manager.clone(), messages.clone());
 
         Self {
             messages,
@@ -81,9 +69,10 @@ impl UiRenderLoop {
             clipboard,
             ui_renderer,
             cursor_position,
-            state,
-            engine,
+            controls,
             scene_manager,
+            cache: user_interface::Cache::new(),
+            cursor: mouse::Cursor::Unavailable,
         }
     }
 
@@ -93,74 +82,118 @@ impl UiRenderLoop {
         window: &winit::window::Window,
         surface_view: &wgpu::TextureView,
     ) {
-        let mut debug = Debug::new();
+        let viewport = Viewport::with_physical_size(
+            iced::Size::new(geometry.window_size.width, geometry.window_size.height),
+            geometry.scale_factor as f32,
+        );
 
-        let (uncaught_events, viewport) = {
-            let viewport = {
-                let size =
-                    iced::Size::<u32>::new(geometry.window_size.width, geometry.window_size.height);
-                Viewport::with_physical_size(size, geometry.scale_factor)
-            };
+        // Update cursor position
+        let cursor_position = *self.cursor_position.lock().unwrap();
+        self.cursor = mouse::Cursor::Available(conversion::cursor_position(
+            iced_winit::winit::dpi::PhysicalPosition::new(
+                cursor_position.x,
+                cursor_position.y,
+            ),
+            geometry.scale_factor as f32,
+        ));
 
-            log::trace!("Updating UI state");
-            for event in self.events.lock().unwrap().drain(..) {
-                self.state.queue_event(event);
-            }
+        log::trace!("Processing UI events and messages");
 
-            for msg in self.messages.take() {
-                self.state.queue_message(msg);
-            }
-
-            let cursor_position = *self.cursor_position.lock().unwrap();
-
-            let (uncaught_events, _) = self.state.update(
+        // Process all pending events first
+        let events = self.events.lock().unwrap().drain(..).collect::<Vec<_>>();
+        
+        if !events.is_empty() {
+            // Build the UI
+            let mut interface = UserInterface::build(
+                self.controls.view(),
                 viewport.logical_size(),
-                Cursor::Available(conversion::cursor_position(
-                    cursor_position,
-                    geometry.scale_factor,
-                )),
+                std::mem::take(&mut self.cache),
                 &mut self.ui_renderer,
-                &iced::Theme::Light,
-                &iced_core::renderer::Style {
-                    text_color: iced::Color::BLACK,
-                },
-                &mut self.clipboard,
-                &mut debug,
             );
 
-            (uncaught_events, viewport)
-        };
+            let mut messages = Vec::new();
 
-        for event in uncaught_events {
-            self.handle_event(event);
+            // Update the UI with events
+            let (_state, event_statuses) = interface.update(
+                &events,
+                self.cursor,
+                &mut self.ui_renderer,
+                &mut self.clipboard,
+                &mut messages,
+            );
+
+            self.cache = interface.into_cache();
+
+            // Process any messages generated by the UI
+            for message in messages {
+                self.controls.update(message);
+            }
+
+            // Handle events that the UI didn't consume (Status::Ignored)
+            // These are for scene interactions like clicking on nodes, camera control, etc.
+            for (event, status) in events.iter().zip(event_statuses.iter()) {
+                if status == &iced::event::Status::Ignored {
+                    self.handle_event(event.clone());
+                }
+            }
         }
 
-        // Draw UI
-        log::trace!("Rendering UI");
-        let device = self.renderer.get_device();
-        let queue = self.renderer.get_render_queue();
-        let mut encoder =
-            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+        // Process pending messages from the application
+        for msg in self.messages.take() {
+            self.controls.update(msg);
+        }
 
+        // Draw the UI
+        log::trace!("Drawing UI");
+
+        // Build the UI for drawing
+        let mut interface = UserInterface::build(
+            self.controls.view(),
+            viewport.logical_size(),
+            std::mem::take(&mut self.cache),
+            &mut self.ui_renderer,
+        );
+
+        // Update with a RedrawRequested event to ensure proper rendering
+        let (_state, _) = interface.update(
+            &[Event::Window(iced::window::Event::RedrawRequested(
+                iced::time::Instant::now(),
+            ))],
+            self.cursor,
+            &mut self.ui_renderer,
+            &mut self.clipboard,
+            &mut Vec::new(),
+        );
+
+        // Update mouse cursor
+        if let user_interface::State::Updated {
+            mouse_interaction, ..
+        } = _state
+        {
+            window.set_cursor(conversion::mouse_interaction(mouse_interaction));
+        }
+
+        // Draw the interface
+        interface.draw(
+            &mut self.ui_renderer,
+            &iced::Theme::Light,
+            &renderer::Style {
+                text_color: iced::Color::BLACK,
+            },
+            self.cursor,
+        );
+
+        self.cache = interface.into_cache();
+
+        // Present to the surface
         self.ui_renderer.present(
-            &mut self.engine,
-            device,
-            queue,
-            &mut encoder,
-            None,
+            None, // clear_color - we don't clear since we draw on top of the scene
             self.renderer.get_texture_format(),
             surface_view,
             &viewport,
-            &debug.overlay(),
         );
 
-        log::trace!("Finishing UI");
-
-        self.engine.submit(queue, encoder);
-
-        window.set_cursor(iced_winit::conversion::mouse_interaction(
-            self.state.mouse_interaction(),
-        ));
+        log::trace!("UI rendering complete");
     }
 
     fn handle_event(&self, event: Event) {

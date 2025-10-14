@@ -343,8 +343,8 @@ impl NakamotoNodeLedger {
         }
 
         // After the new fork has been applied, we can check for commits
-        if let Some(old_head) = old_head {
-            if new_head.get_height() > old_head.get_height() && new_head.get_height() > commit_delay
+        if let Some(old_head) = old_head
+            && new_head.get_height() > old_head.get_height() && new_head.get_height() > commit_delay
             {
                 let mut committed_block = new_head;
 
@@ -370,7 +370,6 @@ impl NakamotoNodeLedger {
                     }
                 }
             }
-        }
     }
 
     /// Picks the longest chain

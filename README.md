@@ -9,6 +9,7 @@ This project simulates blockchain protocols using the `asim` crate. It also prov
 ### Required Packages
 * LLVM, Clang, and LLD
 * just: `cargo install just`
+* naga: `cargo install naga-cli`
 
 ## Supported Protocols
 SimBA can simulate PBFT, Bitcoin, and Ethereum. There is work on the way for Avalanche and Ethereum 2.0.
@@ -18,7 +19,7 @@ SimBA can simulate PBFT, Bitcoin, and Ethereum. There is work on the way for Ava
 `simba` is the command line interface to run experiments. 
 
 ## Desktop UI
-`simba-visualizer` provies a graphical userinterface using wgpu and iced to inspect the blockchain network as the simulation executes.
+`simba-visualizer` provides a graphical userinterface using wgpu and iced to inspect the blockchain network as the simulation executes.
 
 ## Web UI
 One goal of this simulator is to provide web support, so that it can easily be embedded into blog posts and online tutorials.

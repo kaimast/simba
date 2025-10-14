@@ -3,7 +3,7 @@ use tokio::sync::Mutex;
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use wgpu::util::power_preference_from_env;
+// power_preference_from_env was removed in wgpu 26
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -43,8 +43,9 @@ pub struct Material {
 
 impl Renderer {
     pub async fn new<'a>(window: &Window) -> anyhow::Result<(Self, wgpu::Surface<'a>)> {
-        let backends = wgpu::util::backend_bits_from_env().unwrap_or(wgpu::Backends::all());
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+        // backend_bits_from_env was removed in wgpu 26, using default backends
+        let backends = wgpu::Backends::all();
+        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
             backends,
             ..Default::default()
         });
@@ -66,8 +67,7 @@ impl Renderer {
         let adapter: wgpu::Adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 compatible_surface: Some(&surface),
-                power_preference: power_preference_from_env()
-                    .unwrap_or(wgpu::PowerPreference::LowPower),
+                power_preference: wgpu::PowerPreference::LowPower,
                 force_fallback_adapter: false,
             })
             .await
@@ -83,8 +83,8 @@ impl Renderer {
                     required_features: wgpu::Features::default(),
                     required_limits: limits,
                     memory_hints: wgpu::MemoryHints::Performance,
+                    trace: wgpu::Trace::Off,
                 },
-                None,
             )
             .await
             .expect("Failed to get graphics device");
