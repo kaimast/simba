@@ -3,6 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use instant::Instant;
+use log::{debug, trace};
 
 use simba::Simulation;
 
@@ -18,12 +19,24 @@ pub struct RenderContext<'a> {
 }
 
 pub struct RenderLoop<'a> {
-    graphics: Arc<Graphics>,
     ui_render_loop: UiRenderLoop,
-    window: Arc<winit::window::Window>,
-    scene_mgr: Arc<SceneManager>,
+    graphics: Arc<Graphics>,
     render_context: RenderContext<'a>,
+    scene_mgr: Option<Arc<SceneManager>>,
+    window: Arc<winit::window::Window>,
     stop_flag: Arc<AtomicBool>,
+}
+
+impl<'a> Drop for RenderLoop<'a> {
+    fn drop(&mut self) {
+        trace!("Destroying render loop");
+    }
+}
+
+impl<'a> Drop for RenderContext<'a> {
+    fn drop(&mut self) {
+        debug!("Destroying render context");
+    }
 }
 
 impl<'a> RenderLoop<'a> {
@@ -74,7 +87,7 @@ impl<'a> RenderLoop<'a> {
             graphics,
             window,
             ui_render_loop,
-            scene_mgr,
+            scene_mgr: Some(scene_mgr),
             render_context,
             stop_flag,
         }
@@ -90,11 +103,21 @@ impl<'a> RenderLoop<'a> {
             let start = Instant::now();
             let elapsed = start - last_frame_time;
 
-            self.scene_mgr.update();
+            if let Some(scene_mgr) = &self.scene_mgr {
+                scene_mgr.update();
+            }
             self.draw(elapsed.as_secs_f64()).await;
 
             last_frame_time = start;
         }
+
+        debug!("Render loop finished");
+
+        // Drop scene_mgr to abort background tasks while tokio runtime is still active
+        debug!("Dropping scene_mgr to abort background tasks");
+        self.scene_mgr = None;
+
+        debug!("Render loop exiting cleanly");
     }
 
     #[tracing::instrument(skip(self))]
@@ -134,7 +157,17 @@ impl<'a> RenderLoop<'a> {
                 log::debug!("Got swap chain timeout. Retrying..");
                 return;
             }
+            Err(wgpu::SurfaceError::Lost) => {
+                log::debug!("Surface lost (window might be closing). Exiting render loop.");
+                self.stop_flag.store(true, Ordering::SeqCst);
+                return;
+            }
             Err(error) => {
+                // During shutdown, surface errors are expected
+                if self.stop_flag.load(Ordering::Relaxed) {
+                    log::debug!("Surface error during shutdown: {error}");
+                    return;
+                }
                 log::error!("Got unexpected swap chain error: {error}");
                 exit(-1);
             }
@@ -176,11 +209,13 @@ impl<'a> RenderLoop<'a> {
         }
 
         log::trace!("Drawing scene");
-        let mut scene_commands = {
-            let (camera, drawables) = self.scene_mgr.get_drawables().await;
+        let mut scene_commands = if let Some(scene_mgr) = &self.scene_mgr {
+            let (camera, drawables) = scene_mgr.get_drawables().await;
             self.graphics
                 .draw(&surface_view, elapsed, camera, drawables)
                 .await
+        } else {
+            vec![]
         };
 
         commands.append(&mut scene_commands);
@@ -230,15 +265,18 @@ impl<'a> RenderLoop<'a> {
             .first()
             .expect("No supported texture format found");
 
-        surface.configure(device, &SurfaceConfiguration {
-            usage: TextureUsages::RENDER_ATTACHMENT,
-            format,
-            width: size.width,
-            height: size.height,
-            alpha_mode: wgpu::CompositeAlphaMode::Auto,
-            present_mode: wgpu::PresentMode::AutoVsync,
-            view_formats: vec![],
-            desired_maximum_frame_latency: 2,
-        })
+        surface.configure(
+            device,
+            &SurfaceConfiguration {
+                usage: TextureUsages::RENDER_ATTACHMENT,
+                format,
+                width: size.width,
+                height: size.height,
+                alpha_mode: wgpu::CompositeAlphaMode::Auto,
+                present_mode: wgpu::PresentMode::AutoVsync,
+                view_formats: vec![],
+                desired_maximum_frame_latency: 2,
+            },
+        )
     }
 }

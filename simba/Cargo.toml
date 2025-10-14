@@ -33,6 +33,9 @@ struct_iterable = { git="https://github.com/kaimast/rust_struct_iterable.git", b
 env_logger = "0.11"
 test-log = "0.2"
 
+[build-dependencies]
+rusty-hooks-integration = "0.12"
+
 [features]
 default = []
 all = ["runners"]

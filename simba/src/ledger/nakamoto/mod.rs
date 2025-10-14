@@ -344,32 +344,33 @@ impl NakamotoNodeLedger {
 
         // After the new fork has been applied, we can check for commits
         if let Some(old_head) = old_head
-            && new_head.get_height() > old_head.get_height() && new_head.get_height() > commit_delay
-            {
-                let mut committed_block = new_head;
+            && new_head.get_height() > old_head.get_height()
+            && new_head.get_height() > commit_delay
+        {
+            let mut committed_block = new_head;
 
-                for _ in 0..commit_delay {
-                    committed_block = self
-                        .blocks
-                        .get(committed_block.get_parent_id())
-                        .expect("Failed to get committed block; this should not happen");
+            for _ in 0..commit_delay {
+                committed_block = self
+                    .blocks
+                    .get(committed_block.get_parent_id())
+                    .expect("Failed to get committed block; this should not happen");
+            }
+
+            for txn_id in committed_block.get_transactions() {
+                //TODO store older state in a more efficient way
+                let txn = self
+                    .known_transactions
+                    .get(txn_id)
+                    .expect("block contained unknown transaction");
+                if !self.applied_transactions.contains(txn_id) {
+                    panic!("Committed transaction was never applied");
                 }
 
-                for txn_id in committed_block.get_transactions() {
-                    //TODO store older state in a more efficient way
-                    let txn = self
-                        .known_transactions
-                        .get(txn_id)
-                        .expect("block contained unknown transaction");
-                    if !self.applied_transactions.contains(txn_id) {
-                        panic!("Committed transaction was never applied");
-                    }
-
-                    if let Some(func) = &self.notify_transaction_commit_fn {
-                        func(txn.get_source(), txn_id);
-                    }
+                if let Some(func) = &self.notify_transaction_commit_fn {
+                    func(txn.get_source(), txn_id);
                 }
             }
+        }
     }
 
     /// Picks the longest chain

@@ -113,7 +113,6 @@ impl Statistics {
         }
 
         loop {
-            log::trace!("Updating statistics");
             let mut global_stats = GlobalStatistics::default();
 
             for (_, node) in self.scene.get_nodes().iter() {

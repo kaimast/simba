@@ -12,6 +12,7 @@ struct LinkState {
     active_new: bool,
 }
 
+/// Represents a network link between two nodes.
 pub struct Link {
     identifier: ObjectId,
     line: Arc<Drawable>,

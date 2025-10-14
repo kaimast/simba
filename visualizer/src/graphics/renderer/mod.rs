@@ -77,15 +77,13 @@ impl Renderer {
 
         log::debug!("Setting up graphics device \"{}\"", adapter.get_info().name);
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: Some("SimBA graphics device"),
-                    required_features: wgpu::Features::default(),
-                    required_limits: limits,
-                    memory_hints: wgpu::MemoryHints::Performance,
-                    trace: wgpu::Trace::Off,
-                },
-            )
+            .request_device(&wgpu::DeviceDescriptor {
+                label: Some("SimBA graphics device"),
+                required_features: wgpu::Features::default(),
+                required_limits: limits,
+                memory_hints: wgpu::MemoryHints::Performance,
+                trace: wgpu::Trace::Off,
+            })
             .await
             .expect("Failed to get graphics device");
         //            .with_context(|| "Get graphics device")?;

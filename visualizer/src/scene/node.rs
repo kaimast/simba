@@ -12,6 +12,7 @@ use crate::ui::{
 
 use super::SceneObject;
 
+/// Represents a node participating in the blockchain network.
 pub struct Node {
     identifier: ObjectId,
     node_index: NodeIndex,

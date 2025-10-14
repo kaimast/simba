@@ -386,9 +386,10 @@ impl TryInto<usize> for ParameterValue {
 
     fn try_into(self) -> Result<usize, ()> {
         if let Self::Int(i) = self
-            && i >= 0 {
-                return Ok(i as usize);
-            }
+            && i >= 0
+        {
+            return Ok(i as usize);
+        }
 
         Err(())
     }
@@ -399,9 +400,10 @@ impl TryInto<u32> for ParameterValue {
 
     fn try_into(self) -> Result<u32, ()> {
         if let Self::Int(i) = self
-            && i >= 0 {
-                return Ok(i as u32);
-            }
+            && i >= 0
+        {
+            return Ok(i as u32);
+        }
 
         Err(())
     }

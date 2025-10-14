@@ -116,7 +116,7 @@ impl UiLogic {
         }
     }
 
-    pub fn view(&self) -> Element<'_, UiMessage, Theme, iced_wgpu::Renderer> {
+    pub fn view(&self) -> Element<'_, UiMessage, Theme, iced::Renderer> {
         log::trace!("Creating new UI View");
 
         let time = self.simulation.get_current_time();
@@ -130,7 +130,6 @@ impl UiLogic {
             );
 
             Card::new(Text::new("View"), pick_list).width(Length::Fixed(150.0))
-
         };
 
         // Allows changing simulation speed
@@ -161,7 +160,6 @@ impl UiLogic {
             let content = Column::new().spacing(5).push(time_text).push(controls);
 
             Card::new(Text::new("Simulation"), content)
-
         };
 
         let global_stats = {
@@ -195,7 +193,8 @@ impl UiLogic {
                 }
             }
 
-            let selected_card = Card::new(Text::new(name), content).on_close(UiMessage::ObjectUnselected);
+            let selected_card =
+                Card::new(Text::new(name), content).on_close(UiMessage::ObjectUnselected);
             cards.push(selected_card)
         } else {
             cards

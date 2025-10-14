@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use log::debug;
 use parking_lot::Mutex;
 
 use simba::Simulation;
@@ -81,6 +82,14 @@ trait SceneObject {
 pub struct SceneManager {
     scenes: HashMap<ViewType, Arc<Scene>>,
     active_scene: Mutex<ViewType>,
+}
+
+impl Drop for SceneManager {
+    fn drop(&mut self) {
+        debug!("Destroying scene manager with {} scenes", self.scenes.len());
+        // Explicitly drop scenes to trigger background task abortion
+        self.scenes.clear();
+    }
 }
 
 impl SceneManager {

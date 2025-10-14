@@ -171,6 +171,7 @@ fn compute_bounding_box(start: &Vec2, end: &Vec2) -> BoundingBox {
     BoundingBox::new(Vec2::new(x1, y1), Vec2::new(x2, y2))
 }
 
+/// Creates a new drawable line.
 #[allow(clippy::too_many_arguments)]
 pub(super) async fn new_drawable(
     identifier: DrawableId,

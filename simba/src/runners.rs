@@ -458,17 +458,24 @@ mod tests {
 
     #[test]
     fn interval_generator() {
-        let mut params = vec![];
-        params.push((ParameterType::NumClients, Interval::LinearInt {
-            start: 10,
-            end: 60,
-            step_size: 10,
-        }));
-        params.push((ParameterType::NumMiningNodes, Interval::LinearFloat {
-            start: 0.2,
-            end: 1.0,
-            step_size: 0.2,
-        }));
+        let params = vec![
+            (
+                ParameterType::NumClients,
+                Interval::LinearInt {
+                    start: 10,
+                    end: 60,
+                    step_size: 10,
+                },
+            ),
+            (
+                ParameterType::NumMiningNodes,
+                Interval::LinearFloat {
+                    start: 0.2,
+                    end: 1.0,
+                    step_size: 0.2,
+                },
+            ),
+        ];
 
         let generator = IntervalGenerator::new(params).unwrap();
         let first_step = generator.get_step(0).unwrap();

@@ -7,6 +7,7 @@ use winit::keyboard::ModifiersState;
 use winit::window::WindowId;
 
 use anyhow::Context;
+use log::debug;
 
 use crate::graphics::Graphics;
 use crate::scene::SceneManager;
@@ -52,6 +53,8 @@ impl WindowLoop {
 impl WinitHandler for ApplicationHandler {
     fn resumed(&mut self, _event_loop: &ActiveEventLoop) {}
 
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {}
+
     fn window_event(
         &mut self,
         event_loop: &ActiveEventLoop,
@@ -60,9 +63,10 @@ impl WinitHandler for ApplicationHandler {
     ) {
         // Handle window-specific events first
         match &window_event {
-            WindowEvent::CloseRequested | WindowEvent::Destroyed => {
-                log::debug!("Close requested. Shutting down...");
+            WindowEvent::CloseRequested => {
+                debug!("Received request to close window");
                 event_loop.exit();
+                return;
             }
             WindowEvent::ModifiersChanged(new_modifiers) => {
                 self.modifiers = new_modifiers.state();

@@ -88,6 +88,13 @@ impl Camera {
         config.dirty = true;
     }
 
+    pub fn move_by(&self, delta: Vec2) {
+        let mut config = self.configuration.lock();
+        config.position.x += delta.x;
+        config.position.y += delta.y;
+        config.dirty = true;
+    }
+
     pub fn get_position_from_cursor(&self, cursor_pos: LogicalPosition<f64>) -> Vec2 {
         let config = self.configuration.lock();
 
@@ -117,7 +124,40 @@ impl Camera {
         config.dirty = true;
     }
 
-    //TODO remove
+    /// Zooms the camera by the given delta, keeping the world position under the cursor fixed
+    pub fn change_zoom(&self, delta: f32, cursor_pos: LogicalPosition<f64>) {
+        let logical_size: LogicalSize<f32> = {
+            let geometry = self.renderer.get_geometry();
+            geometry.window_size.to_logical(geometry.scale_factor)
+        }; // Drop geometry lock before acquiring config lock
+
+        let mut config = self.configuration.lock();
+
+        // Get world position under cursor before zoom
+        let cursor_pos_vec = Vec2::new(cursor_pos.x as f32, cursor_pos.y as f32);
+        let center = 0.5 * Vec2::new(logical_size.width, logical_size.height);
+        let cursor_offset = cursor_pos_vec - center;
+
+        // In OpenGL coordinates (flip Y)
+        let cursor_offset_gl = Vec2::new(cursor_offset.x, -cursor_offset.y);
+
+        let old_zoom = config.zoom;
+        let world_pos_under_cursor =
+            Vec2::new(config.position.x, config.position.y) + cursor_offset_gl / old_zoom;
+
+        // Apply zoom
+        let new_zoom = (old_zoom - delta).clamp(1.0, 50.0);
+        let view_size = Vec2::new(logical_size.width, logical_size.height) / new_zoom;
+
+        // Calculate new camera position to keep world_pos_under_cursor at the same screen location
+        let new_camera_pos = world_pos_under_cursor - cursor_offset_gl / new_zoom;
+
+        config.position = Vec3::new(new_camera_pos.x, new_camera_pos.y, 0.0);
+        config.view_size = view_size;
+        config.zoom = new_zoom;
+        config.dirty = true;
+    }
+
     pub fn set_zoom(&self, zoom: f32) {
         let geometry = self.renderer.get_geometry();
         let logical_size: LogicalSize<f32> = geometry.window_size.to_logical(geometry.scale_factor);

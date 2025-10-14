@@ -4,10 +4,9 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use simba::{BlockEvent, BlockId, GENESIS_BLOCK, LinkEvent, Location, NodeEvent, Simulation};
 
-use glam::Vec2;
-
 use dashmap::DashMap;
-
+use glam::Vec2;
+use log::trace;
 use parking_lot::Mutex;
 use tokio::sync::mpsc;
 
@@ -32,6 +31,18 @@ pub struct Scene {
     camera: Arc<Camera>,
     objects: DashMap<ObjectId, ObjWrapper>,
     selected: Mutex<Option<Arc<dyn SceneObject>>>,
+    // Background tasks that need to be aborted on shutdown
+    background_tasks: Mutex<Vec<tokio::task::JoinHandle<()>>>,
+}
+
+impl Drop for Scene {
+    fn drop(&mut self) {
+        let mut tasks = self.background_tasks.lock();
+        log::debug!("Dropping scene, aborting {} background tasks", tasks.len());
+        for task in tasks.drain(..) {
+            task.abort();
+        }
+    }
 }
 
 impl Scene {
@@ -60,6 +71,7 @@ impl Scene {
             camera,
             selected: Mutex::new(None),
             next_object_id: AtomicU64::new(1),
+            background_tasks: Mutex::new(Vec::new()),
         });
 
         let node_map = Arc::new(DashMap::new());
@@ -67,7 +79,7 @@ impl Scene {
 
         let sim_cpy = simulation.clone();
 
-        {
+        let node_task = {
             let scene = obj.clone();
             let graphics = graphics.clone();
 
@@ -108,8 +120,8 @@ impl Scene {
                         }
                     }
                 }
-            });
-        }
+            })
+        };
 
         simulation.set_node_event_callback(Box::new(move |node_id, event: NodeEvent| {
             if let Err(err) = node_event_sender.send((node_id, event)) {
@@ -117,12 +129,15 @@ impl Scene {
             }
         }));
 
+        // Register task so it will be aborted on shutdown
+        obj.background_tasks.lock().push(node_task);
+
         let scene = obj.clone();
 
         let links = Arc::new(DashMap::new());
         let (link_event_sender, mut link_event_receiver) = mpsc::unbounded_channel();
 
-        {
+        let link_task = {
             let graphics = graphics.clone();
             let simulation = simulation.clone();
             spawn_task(async move {
@@ -150,14 +165,17 @@ impl Scene {
                         }
                     }
                 }
-            });
-        }
+            })
+        };
 
         simulation.set_link_event_callback(Box::new(move |link_id, event: LinkEvent| {
             if let Err(err) = link_event_sender.send((link_id, event)) {
                 log::trace!("Failed to forward link event: {err:?}");
             }
         }));
+
+        // Register task so it will be aborted on shutdown
+        obj.background_tasks.lock().push(link_task);
 
         obj
     }
@@ -208,6 +226,7 @@ impl Scene {
             camera,
             selected: Mutex::new(None),
             next_object_id: AtomicU64::new(1),
+            background_tasks: Mutex::new(Vec::new()),
         });
 
         let (block_event_sender, mut block_event_receiver) = mpsc::unbounded_channel();
@@ -220,7 +239,7 @@ impl Scene {
 
         let scene = obj.clone();
 
-        spawn_task(async move {
+        let block_task = spawn_task(async move {
             while let Some((block_id, block_event)) = block_event_receiver.recv().await {
                 match block_event {
                     BlockEvent::Created {
@@ -331,11 +350,15 @@ impl Scene {
             }
         });
 
+        // Register task so it will be aborted on shutdown
+        obj.background_tasks.lock().push(block_task);
+
         obj
     }
 
     #[tracing::instrument(skip(self))]
     pub fn update(&self) {
+        trace!("Updating scene with {} objects", self.objects.len());
         for obj in self.objects.iter() {
             obj.0.update();
         }

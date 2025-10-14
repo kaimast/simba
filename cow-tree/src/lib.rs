@@ -2,7 +2,7 @@
 // Remove after upgrading to generic-array 1.0
 #![allow(deprecated)]
 
-use generic_array::{typenum, GenericArray};
+use generic_array::{GenericArray, typenum};
 
 mod node;
 use node::{FrozenNode, Node};

@@ -5,6 +5,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use anyhow::Context;
+use log::{debug, info};
 
 use winit::dpi::{LogicalSize, Size};
 use winit::event_loop::EventLoop as WinitEventLoop;
@@ -141,17 +142,29 @@ async fn main() -> anyhow::Result<()> {
                 .await;
 
                 render_loop.run().await;
-            })
+            });
+
+            debug!("Rendering thread finished");
         })
     };
 
-    let window_loop = WindowLoop::default();
-    window_loop.run(winit_loop, ui_events, graphics, scene_mgr, cursor_position)?;
+    info!("Starting window event loop (this will block until window closes)...");
+    // This will block until the window is closed
+    WindowLoop::default().run(winit_loop, ui_events, graphics, scene_mgr, cursor_position)?;
 
-    stop_flag.store(true, Ordering::SeqCst);
+    info!("Window closed, initiating shutdown...");
 
-    let _ = render_thread.join();
+    // Stop simulation first to prevent new events
     simulation.stop();
 
+    // Signal render thread to stop
+    stop_flag.store(true, Ordering::SeqCst);
+
+    // Wait for render thread to finish
+    // Background tasks will be aborted when Scenes are dropped
+    info!("Waiting for render thread...");
+    let _ = render_thread.join();
+
+    info!("Shutdown complete");
     Ok(())
 }

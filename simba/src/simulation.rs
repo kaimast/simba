@@ -1162,7 +1162,6 @@ impl Drop for Simulation {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test_log::test;
 
     #[test]
     fn full_connectivity() {

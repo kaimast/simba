@@ -15,6 +15,7 @@ pub struct BlockMetrics {
     pub num_transactions: usize,
 }
 
+/// Represents a block in the blockchain.
 pub struct Block {
     identifier: ObjectId,
     block_id: BlockId,

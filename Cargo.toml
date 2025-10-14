@@ -19,22 +19,33 @@ console-subscriber = "0.4"
 dashmap = "6"
 #winit = "0.30"
 winit = { git = "https://github.com/iced-rs/winit.git", rev="05b8ff17a06562f0a10bb46e6eaacbe2a95cb5ed" }
-wgpu = { version="26", features=["spirv"] }
-iced_aw = { git="https://github.com/iced-rs/iced_aw.git", default-features=false }
-#iced = "0.13"
-#iced_runtime = "0.13"
-#iced_renderer = "0.13"
-#iced_winit = "0.13"
-#iced_core = "0.13"
-#iced_wgpu = "0.13"
-iced = { git="https://github.com/iced-rs/iced.git", features=["tokio"], default-features=false }
-iced_runtime = { git="https://github.com/iced-rs/iced.git", default-features=false}
-iced_renderer = { git="https://github.com/iced-rs/iced.git", default-features=false }
-iced_widget = { git="https://github.com/iced-rs/iced.git"}
-iced_winit = { git="https://github.com/iced-rs/iced.git"}
-iced_core = { git="https://github.com/iced-rs/iced.git", default-features=false }
-iced_wgpu = { git="https://github.com/iced-rs/iced.git"}
-iced_futures = { git="https://github.com/iced-rs/iced.git"}
+
+[workspace.dependencies.wgpu]
+version="26"
+features=["spirv"]
+
+[workspace.dependencies.iced_aw]
+git="https://github.com/iced-rs/iced_aw.git"
+default-features=false
+
+[workspace.dependencies.iced_winit]
+#version = "0.14"
+git="https://github.com/iced-rs/iced.git"
+
+[workspace.dependencies.iced]
+#version = "0.14"
+git="https://github.com/iced-rs/iced.git"
+features=["tokio", "wgpu"]
+default-features=false
+
+[workspace.dependencies.iced_renderer]
+#version = "0.14"
+git="https://github.com/iced-rs/iced.git"
+default-features=false
+
+[workspace.dependencies.iced_wgpu]
+#version = "0.14"
+git="https://github.com/iced-rs/iced.git"
 
 [profile.release]
 opt-level = 3

@@ -168,6 +168,7 @@ fn compute_bounding_box(position: &Vec2, style: &RectangleStyle) -> BoundingBox 
     BoundingBox::new(start, end)
 }
 
+/// Creates a new drawable rectangle.
 pub(super) async fn new_drawable(
     identifier: DrawableId,
     position: Vec2,
