@@ -4,7 +4,7 @@ use std::rc::Rc;
 use std::sync::atomic::{AtomicU32, Ordering as AtomicOrdering};
 
 use asim::sync::{Condvar, Mutex};
-use asim::time::{Duration, Time};
+use asim::time::{Duration, Instant};
 
 use derivative::Derivative;
 
@@ -37,9 +37,9 @@ pub struct GossipBlock {
     /// How many nodes have seen this block?
     seen_by: AtomicU32,
     /// Creation time in seconds
-    creation_time: Time,
+    creation_time: Instant,
     /// Time it was seen by all nodes
-    full_propagation_time: RefCell<Option<Time>>,
+    full_propagation_time: RefCell<Option<Instant>>,
 }
 
 impl GossipBlock {

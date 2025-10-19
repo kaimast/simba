@@ -6,9 +6,9 @@ use std::sync::{Arc, OnceLock, mpsc};
 
 use dashmap::DashMap;
 
-use instant::Instant;
+use instant::Instant as RealtimeInstant;
 
-use asim::time::{Duration, START_TIME, Time};
+use asim::time::{Duration, Instant};
 
 use parking_lot::{Condvar, Mutex};
 
@@ -35,7 +35,7 @@ use crate::{ChainMetrics, Location, NetworkMetricType};
 pub type EventCallback<I, T> = Box<dyn Fn(I, T) + Send + Sync>;
 pub type StatsEventCallback = Box<dyn Fn(StatisticsEvent) + Send + Sync>;
 pub type MessageSentEventCallback =
-    Box<dyn Fn(Time, ObjectId, ObjectId, MessageType) + Send + Sync>;
+    Box<dyn Fn(Instant, ObjectId, ObjectId, MessageType) + Send + Sync>;
 
 struct PendingOp {
     result: Mutex<Option<OpResult>>,
@@ -87,7 +87,7 @@ pub struct SimulationInner {
     statistics: Rc<Statistics>,
     command_queue: Arc<Mutex<Vec<Command>>>,
     command_cond: Arc<Condvar>,
-    event_sender: mpsc::Sender<(Time, Event)>,
+    event_sender: mpsc::Sender<(Instant, Event)>,
     state: Arc<Mutex<State>>,
     state_cond: Arc<Condvar>,
 }
@@ -217,7 +217,7 @@ impl Simulation {
 
     #[allow(clippy::too_many_arguments)]
     fn event_handler(
-        event_receiver: mpsc::Receiver<(Time, Event)>,
+        event_receiver: mpsc::Receiver<(Instant, Event)>,
         pending_operations: Arc<DashMap<u64, Arc<PendingOp>>>,
         msg_sent_event_callback: Arc<OnceLock<MessageSentEventCallback>>,
         block_event_callback: Arc<OnceLock<EventCallback<BlockId, BlockEvent>>>,
@@ -358,7 +358,7 @@ impl Simulation {
         self.issue_command(Command::EnableEvents);
     }
 
-    pub fn get_current_time(&self) -> Time {
+    pub fn get_current_time(&self) -> Instant {
         let result = self.issue_operation(OpRequest::CurrentTime);
 
         if let OpResult::CurrentTime(value) = result {
@@ -472,7 +472,7 @@ impl SimulationInner {
         failures: Failures,
         command_queue: Arc<Mutex<Vec<Command>>>,
         command_cond: Arc<Condvar>,
-        event_sender: mpsc::Sender<(Time, Event)>,
+        event_sender: mpsc::Sender<(Instant, Event)>,
         state: Arc<Mutex<State>>,
         state_cond: Arc<Condvar>,
         stats_file: Option<csv::Writer<File>>,
@@ -573,7 +573,7 @@ impl SimulationInner {
     }
 
     fn build_scene(&self, global_logic: &dyn GlobalLogic) {
-        let start = Instant::now();
+        let start = RealtimeInstant::now();
 
         log::debug!("Generating nodes");
 
@@ -779,7 +779,7 @@ impl SimulationInner {
             }
         }
 
-        let elapsed = (Instant::now() - start).as_secs_f64();
+        let elapsed = start.elapsed().as_secs_f64();
 
         log::info!(
             "Simulation started with {} nodes, {} clients, and {} network links",
@@ -839,7 +839,7 @@ impl SimulationInner {
                     match timeout {
                         TimeoutConfig::Seconds { warmup, runtime } => {
                             self.asim.spawn(async move {
-                                let warmup_time = Time::from_seconds(warmup);
+                                let warmup_time = Instant::from_seconds(warmup);
                                 let now = asim::time::now();
                                 if warmup_time > now {
                                     asim::time::sleep(warmup_time - now).await;
@@ -848,7 +848,7 @@ impl SimulationInner {
                                 // Reset statistics after warmup
                                 statistics.reset();
 
-                                let end_time = Time::from_seconds(warmup + runtime);
+                                let end_time = Instant::from_seconds(warmup + runtime);
                                 let now = asim::time::now();
                                 if end_time > now {
                                     asim::time::sleep(end_time - now).await;
@@ -1019,8 +1019,9 @@ impl SimulationInner {
         }
 
         log::debug!("All set up. Will start regular operation.");
+        let timer = self.asim.get_timer();
         let mut last_hour = 0;
-        let mut last_rate_limit = (START_TIME, Instant::now());
+        let mut last_rate_limit = (timer.now(), RealtimeInstant::now());
 
         loop {
             {
@@ -1032,7 +1033,7 @@ impl SimulationInner {
 
             self.process_commands(&global_logic, false);
 
-            let this_hour = self.asim.get_timer().now().to_hours();
+            let this_hour = timer.now().to_hours();
             if this_hour != last_hour {
                 log::info!("{this_hour} hour(s) elapsed");
                 last_hour = this_hour;
@@ -1054,10 +1055,9 @@ impl SimulationInner {
             }
 
             if let Some(rate_limit) = *rate_limit {
-                let timer = self.asim.get_timer();
                 let virtual_elapsed = timer.now() - last_rate_limit.0;
-                let real_elapsed = Instant::now() - last_rate_limit.1;
-                last_rate_limit = (timer.now(), Instant::now());
+                let real_elapsed = last_rate_limit.1.elapsed();
+                last_rate_limit = (timer.now(), RealtimeInstant::now());
 
                 let min_time = std::time::Duration::from_secs_f64(
                     virtual_elapsed.as_seconds_f64() / (rate_limit as f64),
@@ -1126,7 +1126,7 @@ impl SimulationInner {
 
     fn update(&self) {
         // Move time to the next event and execute it
-        self.asim.get_timer().advance();
+        self.asim.get_timer().advance(None);
 
         // Tasks might wake up other tasks so we loop here
         loop {
@@ -1163,10 +1163,8 @@ impl Drop for Simulation {
 mod tests {
     use super::*;
 
-    #[test]
+    #[test_log::test]
     fn full_connectivity() {
-        let _ = env_logger::try_init();
-
         let num_mining_nodes = 11;
         let protocol = ProtocolConfiguration::default();
         let network = NetworkConfiguration::Random {
@@ -1194,10 +1192,8 @@ mod tests {
         );
     }
 
-    #[test]
+    #[test_log::test]
     fn sparse_connectivity() {
-        let _ = env_logger::try_init();
-
         let num_mining_nodes = 10;
         let protocol = ProtocolConfiguration::default();
         let network = NetworkConfiguration::Random {
@@ -1224,10 +1220,8 @@ mod tests {
         assert!(simulation.get_network_metric(NetworkMetricType::NodePeerCount(4)) as u32 >= 4);
     }
 
-    #[test]
+    #[test_log::test]
     fn two_nodes() {
-        let _ = env_logger::try_init();
-
         let num_mining_nodes = 2;
         let protocol = ProtocolConfiguration::default();
         let network = NetworkConfiguration::Random {

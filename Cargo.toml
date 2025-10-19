@@ -9,8 +9,11 @@ members = [
 #    "web-gui",
 ]
 
+[workspace.dependencies.asim]
+#git="http://github.com/kaimast/asim.git"
+path = "../asim"
+
 [workspace.dependencies]
-asim = { git="http://github.com/kaimast/asim.git" }
 log = "0.4"
 rand = "0.9"
 getrandom = "0.3"

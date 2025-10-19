@@ -13,7 +13,7 @@ use crate::metrics::ChainMetrics;
 use crate::node::NodeIndex;
 use crate::object::ObjectId;
 
-use asim::time::{Duration, Time};
+use asim::time::{Duration, Instant};
 
 mod node;
 pub use node::PbftNodeLogic;
@@ -124,7 +124,7 @@ impl GlobalLogic for PbftGlobalLogic {
         loop {
             match timeout {
                 TimeoutConfig::Seconds { warmup, runtime } => {
-                    let end = Time::from_seconds(warmup + runtime);
+                    let end = Instant::from_seconds(warmup + runtime);
                     if end_block.get_creation_time() <= end {
                         break;
                     }
@@ -151,7 +151,7 @@ impl GlobalLogic for PbftGlobalLogic {
         loop {
             match timeout {
                 TimeoutConfig::Seconds { warmup, .. } => {
-                    let start = Time::from_seconds(warmup);
+                    let start = Instant::from_seconds(warmup);
                     if next_block.get_creation_time() < start {
                         break;
                     }

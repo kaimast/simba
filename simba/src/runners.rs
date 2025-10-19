@@ -11,7 +11,7 @@ use fast_float::parse;
 
 use parking_lot::{Condvar, Mutex};
 
-use asim::time::Time;
+use asim::time::Instant;
 
 use crate::config::{
     Constraint, ExperimentConfiguration, FailureConfig, Interval, ParameterType, ParameterValue,
@@ -35,7 +35,7 @@ impl MessageLogger {
         })
     }
 
-    fn write(&self, time: Time, source: &ObjectId, dest: &ObjectId, msg_type: MessageType) {
+    fn write(&self, time: Instant, source: &ObjectId, dest: &ObjectId, msg_type: MessageType) {
         let line = format!("[{time}] {source} -> {dest}: {msg_type}\n");
         self.file.lock().write_all(line.as_bytes()).unwrap();
     }

@@ -9,7 +9,7 @@ use crate::{Message, RcCell};
 use std::cell::RefCell;
 use std::cmp::Ordering;
 
-use asim::time::{Duration, Time};
+use asim::time::{Duration, Instant};
 
 use cow_tree::CowTree;
 
@@ -28,7 +28,8 @@ struct NodeState {
 
     local_ledger: ConventionalNodeLedger,
 
-    last_block_time: Time,
+    last_block_time: Instant,
+
     last_proposed_round: Option<SlotNumber>,
 }
 
@@ -485,7 +486,7 @@ impl PbftNodeLogic {
         let last_proposed_round = None;
         let mut rounds = HashMap::new();
         let pending_messages = Default::default();
-        let last_block_time = Time::from_millis(0);
+        let last_block_time = Instant::from_millis(0);
 
         let local_ledger = ConventionalNodeLedger::new();
 

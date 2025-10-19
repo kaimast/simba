@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::sync::atomic::{AtomicU32, Ordering as AtomicOrdering};
 
-use asim::time::{Duration, Time};
+use asim::time::{Duration, Instant};
 
 use cow_tree::FrozenCowTree;
 
@@ -24,9 +24,9 @@ pub struct NakamotoBlock {
     /// How many nodes have seen this block?
     seen_by: AtomicU32,
     /// Creation time in seconds
-    creation_time: Time,
+    creation_time: Instant,
     /// Time it was seen by all nodes
-    full_propagation_time: RefCell<Option<Time>>,
+    full_propagation_time: RefCell<Option<Instant>>,
     /// What was the difficulty for this block set to?
     /// TODO move difficulty tracking somewhere else
     difficulty: Difficulty,
@@ -100,7 +100,7 @@ impl NakamotoBlock {
         self.mined_by
     }
 
-    pub fn get_creation_time(&self) -> Time {
+    pub fn get_creation_time(&self) -> Instant {
         self.creation_time
     }
 

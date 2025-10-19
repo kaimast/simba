@@ -3,8 +3,6 @@ use std::rc::Rc;
 
 use tokio::sync::Semaphore;
 
-use asim::time::START_TIME;
-
 use crate::clients::Client;
 use crate::config::{Connectivity, TimeoutConfig};
 use crate::link::Link;
@@ -88,7 +86,7 @@ impl GlobalLogic for SnowballGlobalLogic {
         }
 
         //FIXME this does not support warmup
-        let elapsed = asim::time::now() - START_TIME;
+        let elapsed = asim::time::now().absolute();
 
         ChainMetrics {
             total_blocks_mined: 0,

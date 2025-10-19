@@ -14,7 +14,7 @@ use crate::events::{BlockEvent, Event};
 use crate::logic::{AccountState, Block, BlockId, SIGNATURE_SIZE, Transaction, TransactionId};
 use crate::node::NodeIndex;
 
-use asim::time::Time;
+use asim::time::Instant;
 
 pub type SlotNumber = u64;
 
@@ -33,7 +33,7 @@ pub struct ConventionalBlock {
     identifier: BlockId,
     parent: BlockId,
     slot: SlotNumber,
-    creation_time: Time,
+    creation_time: Instant,
 
     /// How many nodes have accepted this block?
     accept_count: AtomicU32,
@@ -79,7 +79,7 @@ impl ConventionalBlock {
         parent: BlockId,
         created_by: NodeIndex,
         transactions: Vec<Rc<Transaction>>,
-        creation_time: Time,
+        creation_time: Instant,
         slot: SlotNumber,
         state: FrozenCowTree<AccountState>,
     ) -> Self {
@@ -99,7 +99,7 @@ impl ConventionalBlock {
         self.accept_count.fetch_add(1, Ordering::SeqCst);
     }
 
-    pub fn get_creation_time(&self) -> Time {
+    pub fn get_creation_time(&self) -> Instant {
         self.creation_time
     }
 

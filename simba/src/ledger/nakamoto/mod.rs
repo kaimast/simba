@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
-use asim::time::Time;
+use asim::time::Instant;
 
 use cow_tree::FrozenCowTree;
 
@@ -119,7 +119,7 @@ impl NakamotoGlobalLedger {
         block
     }
 
-    pub fn get_total_blocks_mined(&self, start: Time, end: Time) -> u64 {
+    pub fn get_total_blocks_mined(&self, start: Instant, end: Instant) -> u64 {
         let mut count: u64 = 0;
 
         for (_, block) in self.all_blocks.iter() {

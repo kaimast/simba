@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::rc::Rc;
 
-use asim::time::{Duration, Time};
+use asim::time::{Duration, Instant};
 
 use crate::RcCell;
 use crate::clients::Client;
@@ -113,7 +113,7 @@ impl GlobalLogic for NakamotoGlobalLogic {
         loop {
             match timeout {
                 TimeoutConfig::Seconds { runtime, warmup } => {
-                    let end = Time::from_seconds(runtime + warmup);
+                    let end = Instant::from_seconds(runtime + warmup);
                     if end_block.get_creation_time() <= end {
                         break;
                     }
@@ -145,7 +145,7 @@ impl GlobalLogic for NakamotoGlobalLogic {
         loop {
             match timeout {
                 TimeoutConfig::Seconds { warmup, .. } => {
-                    let start = Time::from_seconds(warmup);
+                    let start = Instant::from_seconds(warmup);
                     if next_block.get_creation_time() < start {
                         break;
                     }

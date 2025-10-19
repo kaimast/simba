@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::rc::Rc;
 
-use asim::time::{Duration, START_TIME, Time};
+use asim::time::{Duration, Instant};
 
 use crate::config::{
     Difficulty, DifficultyAdjustment, IncrementalDifficultyAdjustment,
@@ -25,7 +25,7 @@ pub trait BlockGenerator {
 }
 
 struct ProofOfWork {
-    target_block_interval: Time,
+    target_block_interval: Instant,
     difficulty_adjustment: DifficultyAdjustment,
     difficulty: Difficulty,
     difficulty_target: DiffTarget,
@@ -71,7 +71,7 @@ impl BlockGenerator for ProofOfWork {
         let elapsed = if let Some(parent) = parent_block {
             new_block.get_creation_time() - parent.get_creation_time()
         } else {
-            new_block.get_creation_time() - START_TIME
+            new_block.get_creation_time().absolute()
         };
 
         let chain_length = new_block.get_height();
@@ -183,7 +183,7 @@ pub fn make_block_generator(
                 difficulty: *initial_difficulty,
                 difficulty_target: diff_target,
                 difficulty_adjustment: *difficulty_adjustment,
-                target_block_interval: Time::from_seconds(*target_block_interval),
+                target_block_interval: Instant::from_seconds(*target_block_interval),
             })
         }
         NakamotoBlockGenerationConfig::Ouroboros {

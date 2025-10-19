@@ -8,7 +8,7 @@ use std::rc::Rc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use asim::sync::Notify;
-use asim::time::{Duration, Time};
+use asim::time::{Duration, Instant};
 
 pub struct Client {
     identifier: ObjectId,
@@ -17,7 +17,7 @@ pub struct Client {
     transaction_interval: Duration,
     node: Rc<Node>,
     next_nonce: AtomicU64,
-    txn_issue_time: RefCell<Option<Time>>,
+    txn_issue_time: RefCell<Option<Instant>>,
     latencies: RefCell<Vec<Duration>>,
     commit_notify: Notify,
 }

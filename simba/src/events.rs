@@ -7,7 +7,7 @@ use crate::node::NodeIndex;
 use crate::object::ObjectId;
 use crate::{ChainMetrics, GlobalStatistics, Location, NetworkMetricType, NodeStatistics};
 
-use asim::time::Time;
+use asim::time::Instant;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum OpRequest {
@@ -26,7 +26,7 @@ pub enum OpResult {
     NetworkMetric(f64),
     NodeLocation(Location),
     NodeIdentifier(ObjectId),
-    CurrentTime(Time),
+    CurrentTime(Instant),
     NodeStatistics(NodeStatistics),
     GlobalStatistics(GlobalStatistics),
 }
@@ -96,12 +96,12 @@ pub enum Command {
     Destroy,
 }
 
-type EventSender = mpsc::Sender<(Time, Event)>;
+type EventSender = mpsc::Sender<(Instant, Event)>;
 
 thread_local! {
     /// The handler for all non-essential events
     /// This is disabled by default to improve performance
-    pub static EVENT_HANDLER: OnceLock<(Time, EventSender)> = OnceLock::default();
+    pub static EVENT_HANDLER: OnceLock<(Instant, EventSender)> = OnceLock::default();
 }
 
 #[macro_export]
